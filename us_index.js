@@ -319,16 +319,21 @@ async function sendMail(bulletin, htmlContent) {
       console.log(`[Resend API] Sending US Bulletin email to ${recipient}...`);
       const { Resend } = require('resend');
       const resend = new Resend(resendApiKey);
-      const data = await resend.emails.send({
+      const response = await resend.emails.send({
         from: 'Finans Bülteni <onboarding@resend.dev>',
         to: [recipient],
         subject: bulletin.title,
         html: htmlContent
       });
-      console.log(`🎉 [Resend Success] US Bulletin sent via Resend API! ID: ${data.id}`);
-      return true;
+
+      if (response.error) {
+        console.warn(`[Resend Error] ${response.error.message || JSON.stringify(response.error)}`);
+      } else if (response.data && response.data.id) {
+        console.log(`🎉 [Resend Success] US Bulletin sent via Resend API! ID: ${response.data.id}`);
+        return true;
+      }
     } catch (err) {
-      console.warn(`[Resend Warning] Resend API failed: ${err.message}`);
+      console.warn(`[Resend Exception] Resend API failed: ${err.message}`);
     }
   }
 
