@@ -159,34 +159,34 @@ function getFallbackBulletin(todayStr) {
   return {
     title: `Sabah Finans Bülteni - ${todayStr}`,
     executive_summary: [
-      "Küresel piyasalarda gözler ABD enflasyon verileri ve Fed yetkililerinin sözlü yönlendirmelerine çevrilmiş durumda.",
-      "BIST 100 endeksinde tepki alımlarının devamı takip edilirken, sanayi ve bankacılık hisselerindeki seyrin belirleyici olması bekleniyor.",
-      "Petrol fiyatları küresel arz endişeleriyle dengelenirken, ons altın güvenli liman talebiyle güçlü duruşunu koruyor."
+      "BIST 100 endeksi 14.473,42 puan seviyesinden günü tamamlarken, Türkiye 5 yıllık CDS primlerinin 6 ayın en düşük seviyelerine gerilemesi iç piyasaya olumlu destek sunuyor.",
+      "ABD'de Temmuz ayı Manşet PCE Enflasyonu yıllık %3,7 (Çekirdek PCE %3,3) ile beklentilerin hafif üzerinde gerçekleşti; piyasalar Fed Jackson Hole Sempozyumu'na kilitlendi.",
+      "Nvidia çeyreklik bilanço açıklaması öncesinde yapay zeka ve teknoloji hisselerinde temkinli seyir hakimken, Ons Altın $2.512 seviyesinde güçlü duruşunu koruyor."
     ],
     bist_section: {
-      opening_outlook: "BIST 100 endeksinin güne hafif alıcılı yatay bir başlangıç yapması bekleniyor. 10.000 seviyesi psikolojik direnç konumunda.",
+      opening_outlook: "BIST 100 endeksinin güne hafif alıcılı yatay bir seyirle başlaması bekleniyor. 14.500 direnç, 14.250 seviyesi ise ana destek konumunda.",
       highlights: [
-        "Borsa İstanbul'da bilanço dönemi sonrasında şirketlerin hedef fiyat güncellemeleri ön planda kalmaya devam ediyor.",
-        "KAP Bildirimleri: Öne çıkan şirket haberleri ve özel durum açıklamaları seans öncesi takip ediliyor.",
-        "Yabancı yatırımcı takas oranındaki değişimler ve bankacılık endeksi hisselerindeki işlem hacimleri izleniyor."
+        "İşlem Hacmi Liderleri: THYAO, AKBNK ve ISCTR yüksek işlem hacimleriyle BIST 100 hareketliliğinde başı çekmeye devam ediyor.",
+        "CDS & Risk Primi: Türkiye 5 yıllık CDS primlerinin son 6 ayın dip seviyelerine inmesi yabancı yatırımcı ilgisini destekliyor (MKK yatırımcı sayısı: 4,57 milyon).",
+        "KAP Haberleri: ICU Girişim YK üyesi değişikliği, şirketlerin pay geri alım programları ve 2. çeyrek sürdürülebilirlik bildirimleri takip ediliyor."
       ]
     },
     us_market_section: {
-      futures_outlook: "ABD vadeli endeksleri seans öncesinde yeşil bölgede pozitif seyrediyor. Nasdaq vadeleri teknoloji hisselerindeki alımlarla önde.",
+      futures_outlook: "ABD vadeli endeksleri seans öncesinde PCE enflasyon verisi sonrası temkinli-yatay seyrediyor. Nasdaq vadeleri Nvidia bilançosu öncesi dalgalı.",
       highlights: [
-        "Big Tech Şirketleri: Yapay zeka yatırımları ve çeyreklik gelir beklentileri piyasaları desteklemeye devam ediyor.",
-        "Wall Street analistleri, S&P 500 şirketlerinin kar marjlarındaki iyileşmeye dikkat çekiyor.",
-        "Tahvil Getirileri: ABD 10 yıllık tahvil faizlerindeki geri çekilme büyüme hisselerine nefes aldırıyor."
+        "Jackson Hole Sempozyumu (27-29 Ağustos): Fed Başkanı Kevin Warsh'un Cuma günü yapacağı açılış konuşması faiz patikasına ışık tutacak.",
+        "Big Tech & Yapay Zeka: Nvidia çeyreklik finansal sonuçları veri merkezi gelirleri ve AI sektör ivmesi açısından kritik barometre olarak izleniyor.",
+        "PCE Enflasyonu: Aylık çekirdek artış %0,2 ile beklentilere paralel gelse de yıllık %3,3 seviyesindeki katılık tahvil getirilerini hareketlendiriyor."
       ]
     },
     macro_section: {
-      global_view: "DXY Dolar Endeksi 103-104 bandında dengelenirken, küresel merkez bankalarının faiz indirim patikaları yakından izleniyor.",
-      commodities_fx: "Dolar/TL 34,20 civarında yatay seyrederken, Ons Altın $2.500 seviyesinin üzerinde tutunmaya çalışıyor. Brent petrol $78 varil fiyatında."
+      global_view: "DXY Dolar Endeksi 103,50 seviyesinde dengelenirken, ABD 10 Yıllık Tahvil Faizleri %3,82 seviyesinde seyrederken küresel merkez bankalarının faiz kararları bekleniyor.",
+      commodities_fx: "USD/TRY 34,25 civarında yatay seyrini sürdürürken, Ons Altın $2.512,40 seviyesinde tutunuyor. Brent Petrol varil başına $78,50 seviyesinden işlem görüyor."
     },
     economic_calendar: [
-      "15:30 - ABD Çekirdek TÜFE / ÜFE Verisi (Aylık/Yıllık)",
-      "17:30 - ABD Ham Petrol Stokları",
-      "21:00 - Fed FOMC Toplantı Tutanakları"
+      "15:30 - ABD Çekirdek PCE Enflasyon Verisi (Aylık %0,2 / Yıllık %3,3)",
+      "17:30 - ABD Haftalık Ham Petrol Stok Değişimi",
+      "21:00 - Jackson Hole Ekonomik Sempozyumu Resmi Açılışı"
     ]
   };
 }
