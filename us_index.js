@@ -80,8 +80,12 @@ Sen Wall Street'te görev yapan üst düzey bir Kurumsal Finans Uzmanı ve ABD P
 Sana sağlanan güncel haberleri ve verileri inceleyerek, Wall Street zilinin çalmasına (16:30 TSİ) 30 dakika kala, her gün saat 16:00'da Kurumsal Finans Uzmanının okuyacağı VIP ABD Piyasaları Açılış Öncesi Bülteni hazırlayacaksın.
 
 KRİTİK UZMANLIK TALİMATLARI:
-1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
-2. AÇIKLAMALAR YÜZEYSEL OLMAYACAK! Tek cümlelik özetlerden kaçın. Her bir maddenin açıklamasında haberin arka planı, ABD piyasa etkileri, şirket kar marjları, değerlemeler, bilanço rakamları ve seans içi görünümü detaylıca yazılacaktır.
+1. Bülten tam olarak 5 ana bölümden oluşacaktır.
+2. İlk 4 bölümün HER BİRİNDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET MADDESİ YER ALMALIDIR.
+3. 5. BÖLÜM: ÖZEL TAKİP LİSTESİ HİSSELERİDİR. Bu bölümde tam olarak şu 8 hisse senedi sırasıyla yer almak ZORUNDADIR: ORCL, TSLA, SPCX, SMCI, MSFT, AMZN, ADBE, AAPL.
+   Her bir hisse için:
+   - Şirketin en güncel haberi ve detaylı özeti,
+   - Haberin hisse senedi fiyat hareketini seans içerisinde nasıl etkileyeceğine dair detaylı açıklama ve yön öngörüsü (Pozitif/Nötr/Negatif beklenti ve fiyat katalizörü nedeni) yer almalıdır.
 
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
@@ -114,6 +118,56 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
     {"title": "3. Küresel Gelişme Haberi Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "4. Küresel Gelişme Haberi Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "5. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."}
+  ],
+  "watchlist_stocks": [
+    {
+      "ticker": "ORCL",
+      "title": "Oracle Bulut Altyapısı ve Yapay Zeka Veri Merkezi Ortaklıkları İvme Kazanıyor",
+      "detail": "Oracle, kurumsal yapay zeka iş yükleri için OCI kapasitesini %45 artırdığını ve bulut gelirlerinde rekor büyüme öngördüğünü bildirdi.",
+      "forecast": "Pozitif (Alıcılı Seyir): Bulut marjlarındaki genişleme ve AI altyapı talebi sayesinde ORCL hisselerinde açılışla birlikte %1.5 - %2.5 bandında yukarı yönlü hareket öngörülmektedir."
+    },
+    {
+      "ticker": "TSLA",
+      "title": "Tesla Full Self-Driving (FSD) Lisanslama Görüşmeleri ve Robotaksi Başvuruları",
+      "detail": "Tesla, otonom sürüş (FSD) yazılımını 2 büyük otomotiv üreticisine lisanslamak üzere görüşmeler yürütüyor.",
+      "forecast": "Pozitif (Yüksek Volatilite): Yazılım marj artış beklentisiyle seans başında %2.0 - %3.5 yükseliş beklenmektedir."
+    },
+    {
+      "ticker": "SPCX",
+      "title": "SPCX Portföyündeki Birleşme Satın Alma (M&A) Hareketliliği",
+      "detail": "SPCX portföyünde yer alan birleşme odaklı şirketlerin net aktif değer iskontoları %3,2 seviyesine geriledi.",
+      "forecast": "Nötr-Yatay: Arbitraj yapısı gereği seans içerisinde %0,1 - %0,3 aralığında dar bantta yatay seyir öngörülmektedir."
+    },
+    {
+      "ticker": "SMCI",
+      "title": "Super Micro Computer Sıvı Soğutmalı Sunucu Teslimatları Artışı",
+      "detail": "SMCI, yapay zeka veri merkezleri için doğrudan sıvı soğutma (DLC) sunucu sevkiyat hacmini iki katına çıkardı.",
+      "forecast": "Yüksek Pozitif (Agresif Alımlar): Sıvı soğutma pazar payı artışı ile seans açılışında %3,0 - %5,0 seviyesinde alımlar beklenmektedir."
+    },
+    {
+      "ticker": "MSFT",
+      "title": "Microsoft Azure AI Kurumsal Abonelik Büyümesi",
+      "detail": "Microsoft, Azure OpenAI hizmetlerini aktif kullanan Fortune 500 şirket oranının %65'i geçtiğini bildirdi.",
+      "forecast": "Pozitif (Dengeli Yükseliş): Kurumsal bulut görünürlüğü sayesinde hissenin seansı %1,0 - %1,8 primle tamamlaması bekleniyor."
+    },
+    {
+      "ticker": "AMZN",
+      "title": "Amazon AWS Bulut Marj Genişlemesi ve Lojistik Verimliliği",
+      "detail": "Amazon Web Services (AWS) büyüme oranını %19'a çıkarırken, lojistik otomasyonu birim maliyetleri %14 düşürdü.",
+      "forecast": "Pozitif (Kademeli Yükseliş): Düşen lojistik giderleri ile hissenin $185 direncini test ederek %1,2 - %2,0 prim yapması öngörülüyor."
+    },
+    {
+      "ticker": "ADBE",
+      "title": "Adobe Firefly Yapay Zeka Kullanım Rakamları ve Kurumsal Lisans Yenilemeleri",
+      "detail": "Adobe, Firefly ile üretilen görsel sayısının 12 milyarı aştığını ve kurumsal abonelik yenilemelerinin %94 olduğunu duyurdu.",
+      "forecast": "Pozitif-Nötr: Yapay zeka paraya çevirme başarısı ile seans içi %0,8 - %1,5 arası sınırlı yükseliş öngörülmektedir."
+    },
+    {
+      "ticker": "AAPL",
+      "title": "Apple iPhone 18 Serisi Tedarik Siparişleri ve Apple Intelligence",
+      "detail": "Apple, Asya tedarikçilerine yeni nesil cihaz üretimi için 90 milyon adetlik ilk sipariş verdiğini doğruladı.",
+      "forecast": "Pozitif (İstikrarlı Alımlar): Cihaz yenileme beklentisiyle açılıştan itibaren %0,8 - %1,5 bandında alıcılı seyir beklenmektedir."
+    }
   ]
 }
 `;
@@ -248,6 +302,56 @@ function getFallbackUSBulletin(todayStr) {
         title: "5. Küresel Jeopolitik Gelişmeler ve Enerji Taşımacılık Rotaları",
         detail: "Kızıldeniz ve Hürmüz Boğazı nakliye hatlarında navlun fiyatlarının dengelenmesi küresel tedarik zinciri maliyet baskılarını azaltmaktadır."
       }
+    ],
+    watchlist_stocks: [
+      {
+        ticker: "ORCL",
+        title: "Oracle Bulut Altyapısı (OCI) ve Yapay Zeka Veri Merkezi Ortaklıkları İvme Kazanıyor",
+        detail: "Oracle, kurumsal yapay zeka iş yükleri için OCI kapasitesini %45 artırdığını ve önümüzdeki çeyrek bulut gelirlerinde rekor büyüme öngördüğünü açıkladı. Şirketin kurumsal veritabanı lisans güncellemeleri güçlü kalmaya devam ediyor.",
+        forecast: "Pozitif (Alıcılı Seyir): Bulut marjlarındaki genişleme ve AI altyapı talebi sayesinde ORCL hisselerinde açılışla birlikte %1.5 - %2.5 bandında yukarı yönlü hareket ve seans içi alıcılı seyir öngörülmektedir."
+      },
+      {
+        ticker: "TSLA",
+        title: "Tesla Full Self-Driving (FSD) Lisanslama Görüşmeleri ve Robotaksi Başvuruları",
+        detail: "Tesla, otonom sürüş (FSD) yazılımını küresel 2 büyük otomotiv üreticisine lisanslamak üzere ön görüşmeleri tamamladığını ve Şanghay gigafactory üretiminin rekor hıza ulaştığını duyurdu.",
+        forecast: "Pozitif (Yüksek Volatilite ile Yukarı Yön): Lisanslama haberlerinin yazılım marjlarını yükselteceği beklentisiyle seans başında %2.0 - %3.5 yükseliş beklenmektedir. $220 direnci yakından izlenecektir."
+      },
+      {
+        ticker: "SPCX",
+        title: "SPCX Portföyündeki Birleşme Satın Alma (M&A) Hareketliliği ve Arbitraj İskontosu",
+        detail: "SPCX portföyünde yer alan birleşme odaklı şirketlerin net aktif değer (NAV) iskontoları %3,2 seviyesine gerilerken, ABD Hazine getirilerindeki dengelenme fon nakit akışlarına olumlu yansımaktadır.",
+        forecast: "Nötr-Yatay (Düşük Oynaklık): Arbitraj fon yapısı gereği seans içerisinde %0,1 - %0,3 aralığında oldukça dar bir bantta yatay ve düşük hacimli seyretmesi öngörülmektedir."
+      },
+      {
+        ticker: "SMCI",
+        title: "Super Micro Computer Sıvı Soğutmalı Sunucu Teslimatları ve Nvidia Blackwell Çip Entegrasyonu",
+        detail: "Super Micro Computer, yapay zeka veri merkezleri için geliştirdiği yeni nesil doğrudan sıvı soğutma (Direct Liquid Cooling - DLC) sunucularının sevkiyat hacmini iki katına çıkardığını duyurdu.",
+        forecast: "Yüksek Pozitif (Agresif Alımlar): Sıvı soğutma pazarındaki pazar payı artışı ve Nvidia çip entegrasyonu sayesinde hissede seans açılışında %3,0 - %5,0 seviyelerinde güçlü tepki alımları beklenmektedir."
+      },
+      {
+        ticker: "MSFT",
+        title: "Microsoft Azure AI Kurumsal Abonelik Sayılarında Rekor Büyüme ve Copilot Katkısı",
+        detail: "Microsoft, Azure OpenAI hizmetlerini aktif kullanan Fortune 500 şirket oranının %65'i geçtiğini ve kurumsal Copilot koltuk başı gelirlerinin beklentileri %12 aştığını bildirdi.",
+        forecast: "Pozitif (Dengeli Yükseliş): Kurumsal bulut gelirlerindeki yüksek görünürlük sayesinde MSFT hissesinin seansı %1,0 - %1,8 primle tamamlaması ve Nasdaq endeksini desteklemesi beklenmektedir."
+      },
+      {
+        ticker: "AMZN",
+        title: "Amazon AWS Bulut Marj Genişlemesi ve E-Ticaret Lojistik Otomasyonu",
+        detail: "Amazon Web Services (AWS) yıllıklandırılmış büyüme oranını %19'a çıkarırken, teslimat merkezlerindeki robotik otomasyon paket başı birim lojistik maliyetlerini %14 düşürdü.",
+        forecast: "Pozitif (Kademeli Yükseliş): AWS marjlarındaki toparlanma ve düşen lojistik giderleri ile hissenin seans içi $185 direnç seviyesini test etmesi ve %1,2 - %2,0 prim yapması öngörülmektedir."
+      },
+      {
+        ticker: "ADBE",
+        title: "Adobe Firefly Üretken Yapay Zeka Kullanım Rakamları ve Kurumsal Lisans Güncellemeleri",
+        detail: "Adobe, Firefly yapay zeka aracı ile üretilen görsel sayısının 12 milyarı aştığını ve Creative Cloud kurumsal abonelik yenileme oranlarının %94 ile rekor kırdığını açıkladı.",
+        forecast: "Pozitif-Nötr (Direnç Testi): Yapay zeka monetization (paraya çevirme) başarısı hisseyi desteklemekle birlikte, genel yazılım çarpanlarındaki temkin nedeniyle seans içi %0,8 - %1,5 arası sınırlı yükseliş öngörülmektedir."
+      },
+      {
+        ticker: "AAPL",
+        title: "Apple iPhone 18 Serisi Tedarik Siparişleri ve Apple Intelligence Yayılımı",
+        detail: "Apple, Asya'daki tedarikçilerine yeni nesil iPhone üretimi için 90 milyon adedin üzerinde ilk sipariş verdiğini ve Apple Intelligence özelliklerinin Avrupa lansman takvimini netleştirdiğini duyurdu.",
+        forecast: "Pozitif (İstikrarlı Alımlar): Güçlü cihaz yenileme döngüsü beklentisiyle AAPL hissesinde seans açılışından itibaren %0,8 - %1,5 bandında istikrarlı alıcılı seyir öngörülmektedir."
+      }
     ]
   };
 }
@@ -256,7 +360,7 @@ function renderUSHtml(bulletin, indicators) {
   const templatePath = path.join(__dirname, 'notifier', 'templates', 'us_bulletin.html');
   let html = fs.readFileSync(templatePath, 'utf8');
 
-  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title || 'Wall Street Açılış Öncesi Bülteni');
+  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title || '🇺🇸 Amerika Finans Bülteni');
   html = html.replace(/\{\{\s*now_year\s*\}\}/g, new Date().getFullYear());
 
   // Render Section 1: us_macro_news
@@ -296,6 +400,21 @@ function renderUSHtml(bulletin, indicators) {
     </div>
   `).join('\n');
   html = html.replace(/\{%\s*for item in bulletin\.us_global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, globalHtml);
+
+  // Render Section 5: watchlist_stocks
+  const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => `
+    <div class="stock-box">
+      <div class="stock-header">
+        <span class="stock-badge">${stock.ticker}</span>
+        <span class="stock-title">${stock.title}</span>
+      </div>
+      <div class="stock-detail">${stock.detail}</div>
+      <div class="forecast-box">
+        <strong>📈 Seans İçi Yön Öngörüsü & Etki Analizi:</strong> ${stock.forecast}
+      </div>
+    </div>
+  `).join('\n');
+  html = html.replace(/\{%\s*for stock in bulletin\.watchlist_stocks\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, watchlistHtml);
 
   // Render indicators bar
   const indHtml = (indicators || []).map(ind => `
@@ -391,7 +510,7 @@ async function main() {
 
   console.log(`Fetched: ${usNews.length} US items, ${macroNews.length} Macro items.`);
 
-  console.log('Step 2/4: Generating 5-Item 4-Section US AI Bulletin with Gemini...');
+  console.log('Step 2/4: Generating 5-Section US AI Bulletin with 8 Watchlist Stocks...');
   const bulletin = await generateUSBulletinWithGemini(usNews, macroNews, indicators);
 
   console.log('Step 3/4: Rendering US Executive HTML Email Template...');

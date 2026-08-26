@@ -134,6 +134,50 @@
       color: #065f46;
       line-height: 1.5;
     }
+    .stock-box {
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #4f46e5;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    .stock-box:last-child {
+      margin-bottom: 0;
+    }
+    .stock-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .stock-badge {
+      background-color: #312e81;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .stock-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .stock-detail {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .forecast-box {
+      background-color: #eff6ff;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.5;
+    }
     .company-badge {
       display: inline-block;
       background-color: #4f46e5;
@@ -159,9 +203,9 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <div class="header-tag">Wall Street Açılış Öncesi Bülteni (16:00)</div>
+      <div class="header-tag">Amerika Finans Bülteni (16:00)</div>
       <h1>{{ bulletin.title }}</h1>
-      <p>S&P 500 | NASDAQ | Dow Jones | Pre-Market Movers | Fed & Makro</p>
+      <p>S&P 500 | NASDAQ | Dow Jones | Pre-Market Movers | Özel Takip Listesi</p>
     </div>
 
     <!-- Live Indicators Bar -->
@@ -219,6 +263,23 @@
           <div class="news-item">
             <div class="news-item-title">🌐 {{ item.title }}</div>
             <div class="news-item-detail">{{ item.detail }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Bölüm 5: Özel Takip Listesi Hisse Haberleri & Seans İçi Yön Öngörüleri -->
+      <div class="card">
+        <h3 class="card-title"><span>🎯</span> 5. Özel Takip Listesi Hisse Haberleri & Seans İçi Yön Öngörüleri</h3>
+        {% for stock in bulletin.watchlist_stocks %}
+          <div class="stock-box">
+            <div class="stock-header">
+              <span class="stock-badge">{{ stock.ticker }}</span>
+              <span class="stock-title">{{ stock.title }}</span>
+            </div>
+            <div class="stock-detail">{{ stock.detail }}</div>
+            <div class="forecast-box">
+              <strong>📈 Seans İçi Yön Öngörüsü & Etki Analizi:</strong> {{ stock.forecast }}
+            </div>
           </div>
         {% endfor %}
       </div>
