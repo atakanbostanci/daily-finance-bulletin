@@ -266,8 +266,8 @@ function renderHtml(bulletin, indicators) {
   let html = fs.readFileSync(templatePath, 'utf8');
 
   // Title & year
-  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title || 'Sabah Finans Bülteni');
-  html = html.replace(/\{\{\s*now_year\s*\}\}/g, new Date().getFullYear());
+  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, () => bulletin.title || 'Sabah Finans Bülteni');
+  html = html.replace(/\{\{\s*now_year\s*\}\}/g, () => new Date().getFullYear());
 
   // Render Section 1: turkey_news
   const turkeyHtml = (bulletin.turkey_news || []).map(i => `
@@ -276,7 +276,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.turkey_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, turkeyHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.turkey_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => turkeyHtml);
 
   // Render Section 2: bist_impact_analysis
   const impactHtml = (bulletin.bist_impact_analysis || []).map(i => `
@@ -285,7 +285,7 @@ function renderHtml(bulletin, indicators) {
       <div class="impact-text"><strong>Olası Borsa Etkisi:</strong> ${i.analysis}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.bist_impact_analysis\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, impactHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.bist_impact_analysis\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => impactHtml);
 
   // Render Section 3: company_news
   const companyHtml = (bulletin.company_news || []).map(i => `
@@ -296,7 +296,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, companyHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => companyHtml);
 
   // Render Section 4: global_news
   const globalHtml = (bulletin.global_news || []).map(i => `
@@ -305,7 +305,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, globalHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => globalHtml);
 
   // Render indicators bar
   const indHtml = (indicators || []).map(ind => `
@@ -313,7 +313,7 @@ function renderHtml(bulletin, indicators) {
       <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*if indicators\s*%\}([\s\S]*?)\{%\s*endif\s*%\}/g, `<div class="indicator-bar">${indHtml}</div>`);
+  html = html.replace(/\{%\s*if indicators\s*%\}([\s\S]*?)\{%\s*endif\s*%\}/g, () => `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
 }

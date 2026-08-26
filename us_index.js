@@ -360,8 +360,8 @@ function renderUSHtml(bulletin, indicators) {
   const templatePath = path.join(__dirname, 'notifier', 'templates', 'us_bulletin.html');
   let html = fs.readFileSync(templatePath, 'utf8');
 
-  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title || '🇺🇸 Amerika Finans Bülteni');
-  html = html.replace(/\{\{\s*now_year\s*\}\}/g, new Date().getFullYear());
+  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
+  html = html.replace(/\{\{\s*now_year\s*\}\}/g, () => new Date().getFullYear());
 
   // Render Section 1: us_macro_news
   const macroHtml = (bulletin.us_macro_news || []).map(i => `
@@ -370,7 +370,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_macro_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, macroHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.us_macro_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => macroHtml);
 
   // Render Section 2: us_market_impact
   const impactHtml = (bulletin.us_market_impact || []).map(i => `
@@ -379,7 +379,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="impact-text"><strong>Olası Seans İçi Etki:</strong> ${i.analysis}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_market_impact\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, impactHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.us_market_impact\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => impactHtml);
 
   // Render Section 3: us_company_news
   const companyHtml = (bulletin.us_company_news || []).map(i => `
@@ -390,7 +390,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, companyHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.us_company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => companyHtml);
 
   // Render Section 4: us_global_news
   const globalHtml = (bulletin.us_global_news || []).map(i => `
@@ -399,7 +399,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, globalHtml);
+  html = html.replace(/\{%\s*for item in bulletin\.us_global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => globalHtml);
 
   // Render Section 5: watchlist_stocks
   const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => `
