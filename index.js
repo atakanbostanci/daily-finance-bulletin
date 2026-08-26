@@ -66,9 +66,10 @@ async function fetchMarketIndicators() {
     { name: 'EUR/TRY', price: '56.10 TL', change_pct: '+0.10%' },
     { name: 'Ons Altın ($)', price: '4,620.00 $', change_pct: '+0.35%' },
     { name: 'Gram Altın', price: '7,140 TL', change_pct: '+0.40%' },
+    { name: 'Ons Gümüş ($)', price: '68.00 $', change_pct: '+0.50%' },
+    { name: 'Gram Gümüş', price: '105.07 TL', change_pct: '+0.45%' },
     { name: 'Brent Petrol ($)', price: '85.50 $', change_pct: '-0.25%' },
-    { name: 'ABD 10Y Tahvil (%)', price: '4.65%', change_pct: '+0.01%' },
-    { name: 'DXY Dolar Endeksi', price: '98.90', change_pct: '+0.10%' }
+    { name: 'ABD 10Y Tahvil (%)', price: '4.65%', change_pct: '+0.01%' }
   ];
   return indicators;
 }
@@ -182,8 +183,8 @@ function getFallbackBulletin(todayStr) {
       ]
     },
     macro_section: {
-      global_view: "DXY Dolar Endeksi 98,90 seviyesinde yatay-pozitif seyrederken, ABD 10 Yıllık Tahvil Faizleri %4,65 seviyesinde dengelenmiş durumdadır.",
-      commodities_fx: "Dolar/TL 48,12 TL, Euro/TL 56,10 TL seviyesinde seyrederken; Ons Altın $4.620, Gram Altın 7.140 TL ve Brent Petrol varil başına $85,50 seviyesinde işlem görmektedir."
+      global_view: "ABD 10 Yıllık Tahvil Faizleri %4,65 seviyesinde dengelenmiş durumdayken, küresel kıymetli madenler ve döviz piyasalarında pozitif seyir izleniyor.",
+      commodities_fx: "Dolar/TL 48,12 TL, Euro/TL 56,10 TL seviyesinde; Ons Altın $4.620, Gram Altın 7.140 TL; Ons Gümüş $68,00, Gram Gümüş 105,07 TL ve Brent Petrol varil başına $85,50 seviyesinde işlem görmektedir."
     },
     economic_calendar: [
       "15:30 - ABD Çekirdek PCE Enflasyon Verisi (Aylık %0,2 / Yıllık %3,3)",
