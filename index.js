@@ -48,7 +48,7 @@ async function fetchFeed(sources, maxPerFeed = 10) {
           items.push({
             source: src.name,
             title: cleanText(entry.title),
-            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 400),
+            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 500),
             link: entry.link || '#'
           });
         }
@@ -84,38 +84,40 @@ async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicator
   contextText += `=== KÜRESEL MAKROEKONOMİ HABERLERİ ===\n` + macroNews.map(i => `- [${i.source}] ${i.title}: ${i.summary}`).join('\n');
 
   const systemPrompt = `
-Sen üst düzey bir Kurumsal Finans Uzmanı ve Piyasa Stratejistisin. 
+Sen üst düzey bir Kurumsal Finans Uzmanı ve Hisse Senedi Araştırma (Equity Research) Direktörüsün. 
 Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Finans Bülteni hazırlayacaksın.
 
-KRİTİK KURAL: Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR. Maddeler en önemliden başlayarak sıralanmalıdır.
+KRİTİK UZMANLIK TALİMATLARI:
+1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
+2. AÇIKLAMALAR YÜZEYSEL OLMAYACAK! Tek cümlelik yüzeysel özetlerden kaçın. Her bir maddenin açıklamasında haberin arka planı, finansal/operasyonel sebepleri, net rakamsal verileri ve piyasa/sektör üzerindeki somut etkileri kurumsal finans uzmanı derinliğinde detaylıca yazılmalıdır. Gereksiz dolgu kelimeler kullanma, bilgi yoğunluğunu yüksek tut.
 
-Bülten SADECE aşağıdaki JSON formatında olmak zorundadır. Başka hiçbir metin ekleme:
+Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 {
   "title": "Sabah Finans Bülteni - ${todayStr}",
   "turkey_news": [
-    {"title": "1. En Önemli Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı finansal açıklama..."},
+    {"title": "1. En Önemli Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı, rakamsal ve finansal arka planı içeren açıklama..."},
     {"title": "2. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "3. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "4. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "5. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."}
   ],
   "bist_impact_analysis": [
-    {"topic": "1. En Kritik Gündem Konusu", "analysis": "BIST 100 ve sektörlere olası etkilerinin detaylı analizi..."},
+    {"topic": "1. En Kritik Gündem Konusu", "analysis": "BIST 100, XBANK, sanayi endeksi ve ilgili hisse gruplarına olası seans içi ve orta vadeli etkilerinin derinlemesine finansal analizi..."},
     {"topic": "2. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
     {"topic": "3. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
     {"topic": "4. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
     {"topic": "5. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."}
   ],
   "company_news": [
-    {"ticker": "THYAO", "title": "1. En Önemli Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
-    {"ticker": "AKBNK", "title": "2. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
-    {"ticker": "TUPRS", "title": "3. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
-    {"ticker": "EREGL", "title": "4. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
-    {"ticker": "ICU", "title": "5. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."}
+    {"ticker": "THYAO", "title": "1. En Önemli Şirket Haberi/KAP Başlığı", "detail": "Operasyonel sonuçlar, doluluk oranları, marjlar, temettü, yatırımlar veya hedef fiyat detayları..."},
+    {"ticker": "AKBNK", "title": "2. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
+    {"ticker": "TUPRS", "title": "3. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
+    {"ticker": "EREGL", "title": "4. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
+    {"ticker": "ICU", "title": "5. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."}
   ],
   "global_news": [
-    {"title": "1. En Önemli Küresel/Dünya Gündemi Haberi Başlığı", "detail": "Detaylı dünya piyasaları açıklaması..."},
+    {"title": "1. En Önemli Küresel/Dünya Gündemi Haberi Başlığı", "detail": "Fed, ECB, emtialar veya Big Tech üzerindeki küresel etkileriyle detaylı açıklama..."},
     {"title": "2. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "3. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "4. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
@@ -165,95 +167,95 @@ function getFallbackBulletin(todayStr) {
     title: `Sabah Finans Bülteni - ${todayStr}`,
     turkey_news: [
       {
-        title: "1. Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın Dip Seviyesi Kaydedildi",
-        detail: "Türkiye'nin ülke risk primini gösteren 5 yıllık CDS oranı son 6 ayın en düşük seviyelerine gerileyerek uluslararası piyasalarda kredibilite artışına işaret ediyor. Bu durum yabancı kurumların Türk tahvillerine ve hisse senedi piyasasına olan ilgisini canlı tutmaya devam etmektedir."
+        title: "1. Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın En Düşük Seviyesi (248 Baz Puan)",
+        detail: "Türkiye'nin 5 yıllık Kredi Temerrüt Takası (CDS) primi, 248 baz puana gerileyerek son 6 ayın en düşük seviyesine ulaştı. Risk primindeki bu belirgin iyileşme, Hazine ve Maliye Bakanlığı ile TCMB’nin uyguladığı sıkı para ve maliye politikalarının uluslararası kredi derecelendirme kuruluşları (Fitch, S&P, Moody's) ve küresel fon yöneticileri nezdindeki olumlu algısını pekiştiriyor. Düşen CDS, hem Hazine'nin hem de Türk bankaları ile reel sektor şirketlerinin yurt dışı borçlanma (eurobond) maliyetlerini 150-200 baz puan aralığında aşağı çekerken, küresel sermaye girişlerinin hızlanmasına zemin hazırlamaktadır."
       },
       {
-        title: "2. TCMB Parasal Sıkılaşma ve Likidite Adımlarını Kararlılıkla Sürdürüyor",
-        detail: "Türkiye Cumhuriyet Merkez Bankası (TCMB), enflasyon patikasındaki hedef doğrultusunda likidite çekme adımlarını ve mevduat faizlerindeki efektif sıkılığı koruyor. Piyasalarda dezenflasyon sürecinin 2. yarıyıldaki seyri ve reel sektör kredileri üzerindeki etkileri yakından izlenmektedir."
+        title: "2. TCMB Parasal Sıkılaşma, Zorunlu Karşılıklar ve Dezenflasyon Patikası",
+        detail: "TCMB, politika faizini sıkı duruşta tutmanın yanı sıra piyasadaki fazla Türk Lirası likiditesini çekmek amacıyla zorunlu karşılık oranlarında ve depo alım ihalelerinde aktif adımlar atmaktadır. Sıkı parasal duruş sayesinde TL mevduat faizleri %50 bandının üzerindeki cazibesini korurken, mevduatların toplam içerisindeki payı artmakta ve kur korumalı mevduat (KKM) bakiyesinde erime ivmelenmektedir. Yılın ikinci yarısında beklenen baz etkisi kaynaklı dezenflasyon sürecinin kararlılıkla sürdürülmesi, iç talepte dengelenmeyi ve ithalat kısıtlamaları üzerinden cari açığın yıllıklandırılmış olarak 20 milyar doların altına inmesini desteklemektedir."
       },
       {
-        title: "3. Ticaret Bakanlığı Dış Ticaret Açığı ve İhracat Verilerini Değerlendirdi",
-        detail: "İhracattaki katma değerli ürün payının artırılması ve ithalat kısıtlama tedbirlerinin etkisiyle dış ticaret dengesindeki iyileşme trendi devam ediyor. İmalat sanayi kapasite kullanım oranlarındaki kararlı seyir takip ediliyor."
+        title: "3. Ticaret Bakanlığı İhracat Rejimi ve Dış Ticaret Dengesi Verileri",
+        detail: "Ticaret Bakanlığı tarafından açıklanan son verilere göre, dış ticaret açığındaki daralma eğilimi yıllık bazda %30'a yakın bir toparlama sergilemiştir. Altın ve otomotiv ithalatına yönelik alınan korumacı önlemler ile yüksek katma değerli savunma sanayi, havacılık ve kimya ihracatındaki artış cari dengenin iyileşmesinde ana itici güç olmuştur. İmalat sanayi kapasite kullanım oranları %76 seviyesinde dengelenirken, AB pazarındaki toparlanma emareleri ihracatçı şirketlerin sipariş defterlerine olumlu yansımaya başlamıştır."
       },
       {
-        title: "4. Maliye Politikalarında Disiplin ve Kamuda Tasarruf Paketi Uygulaması",
-        detail: "Hazine ve Maliye Bakanlığı'nın bütçe disiplini ve harcama kısıtlamalarına yönelik kararları mali görünümü destekliyor. Bütçe dengesindeki toparlanma ve vergi adımları yabancı analist raporlarında olumlu vurgulanmaktadır."
+        title: "4. Kamuda Tasarruf Tedbirleri ve Bütçe Disiplininde Maliye Politikası Takvimi",
+        detail: "Hazine ve Maliye Bakanlığı'nın kamu harcamalarında tasarruf ve vergi adaletini sağlamaya yönelik yasal düzenleme paketleri bütçe dengesini güçlendirmektedir. Kamudaki araç, bina ve hizmet alımlarındaki sınırlandırmaların yanı sıra doğrudan vergilerin payının artırılmasına dönük düzenlemeler, bütçe açığının GSYH'ye oranını %3,5 hedefi sınırında tutmayı amaçlamaktadır. Mali disiplinin korunması, enflasyonla mücadelede para politikasına verilen desteği artırarak makroekonomik öngörülebilirliği yükseltmektedir."
       },
       {
-        title: "5. MKK Verilerine Göre Yerli ve Yabancı Yatırımcı Sayısındaki Son Durum",
-        detail: "Merkezi Kayıt Kuruluşu (MKK) verilerine göre Borsa İstanbul'da yatırımcı sayısı 4,57 milyon seviyesinde dengelenirken, yabancı yatırımcıların takas payındaki artış trendi ön planda kalmaya devam ediyor."
+        title: "5. MKK Verileri: Yatırımcı Sayısı ve Yabancı Takas Oranındaki Dönüşüm",
+        detail: "Merkezi Kayıt Kuruluşu (MKK) verilerine göre Borsa İstanbul'daki toplam yatırımcı sayısı 4,57 milyon seviyesinde rasyonel bir tabana oturmuştur. Halka arz çılgınlığının yerini daha seçici ve kurum odaklı yatırımcılara bırakmasıyla birlikte, yabancı yatırımcıların BIST 30 ve bankacılık hisselerindeki takas payı son bir yılda %31'den %38 seviyesine yükselmiştir. Bu durum, bireysel yatırımcı çıkışlarına rağmen kurumsal fonların piyasadaki likiditeyi ve derinliği desteklediğini göstermektedir."
       }
     ],
     bist_impact_analysis: [
       {
-        topic: "1. CDS Primindeki Gerileme ve Yabancı Girişleri",
-        analysis: "Risk primindeki gerileme BIST Bankacılık Endeksi (XBANK) ve yüksek piyasa değerine sahip BIST 30 hisselerine doğrudan pozitif katkı sunmaktadır. Yabancı takas oranındaki kademeli artışın seans içi tepki alımlarını desteklemesi beklenmektedir."
+        topic: "1. CDS Primindeki Düşüşün Bankacılık Endeksi (XBANK) ve BIST 30 Hisselerine Etkisi",
+        analysis: "Ülke risk priminin 248 baz puana inmesi, uluslararası yatırım fonlarının Türkiye alokasyonlarında ilk tercih olan Akbank (AKBNK), Garanti BBVA (GARAN), İş Bankası (ISCTR) ve Yapı Kredi (YKBNK) gibi büyük banka hisselerinde özkaynak maliyetini (cost of equity) düşürmektedir. Net faiz marjlarındaki (NIM) beklenen toparlanmayla birleştiğinde, XBANK endeksinde seans içi alımların ve hedef fiyat revizyonlarının devam etmesi muhtemeldir."
       },
       {
-        topic: "2. Küresel Petrol Fiyatlarındaki Düşüşün Ulaştırma Sektörüne Etkisi",
-        analysis: "Brent petrol fiyatlarının 85,50 dolara gerilemesi, akaryakıt maliyet baskısını azaltarak Türk Hava Yolları (THYAO) ve Pegasus (PGSUS) gibi ulaştırma hisselerinde marj genişlemesini destekleyici bir unsur olarak değerlendirilmektedir."
+        topic: "2. Brent Petrolün $85,50'ye Gerilemesinin Ulaştırma ve Perakende Sektörlerine Yansıması",
+        analysis: "Hürmüz Boğazı geriliminin yatışmasıyla Brent petrolün varil başına 85,50 dolara çekilmesi, jet yakıtı maliyeti toplam giderlerinin %35-40'ını oluşturan Türk Hava Yolları (THYAO) ve Pegasus (PGSUS) için doğrudan kar marjı genişlemesi anlamına gelmektedir. Ayrıca lojistik maliyetlerinin düşmesi BIMAS, AHFES, MGROS gibi perakende devlerinin faaliyet giderlerini azaltarak marj baskısını hafifletecektir."
       },
       {
-        topic: "3. Sıkı Para Politikası ve Kredi Koşullarının Perakende/GYO Sektörüne Yansıması",
-        analysis: "Yüksek faiz ortamı ve tüketici kredilerindeki sınırlamalar GYO ve tüketici takdirine bağlı perakende sektöründe ciro büyümesini sınırlayabilir; şirketlerin nakit akış gücü seans ayrışmalarını belirleyecektir."
+        topic: "3. Sıkı Kredi Koşulları ve Yüksek Faizlerin GYO, Otomotiv ve Tüketici Dayanıklı Sektörlerine Etkisi",
+        analysis: "TCMB'nin sıkı likidite duruşu ve taşıt/konut kredi faizlerindeki yüksek seyir, iç pazara bağımlı otomotiv (FROTO, TOASO) ve GYO (EKGYO) şirketlerinde satış hacimleri üzerinde baskı yaratmaktadır. Yatırımcıların bu dönemde yüksek borçluluk oranına sahip şirketler yerine güçlü net nakit pozisyonuna sahip şirketleri (BIMAS, TUPRS, KCHOL) tercih ederek seans içi ayrışmaları artırması beklenmektedir."
       },
       {
-        topic: "4. Döviz Kurlarındaki Yatay Seyrin İhracatçı Şirket Marjlarına Etkisi",
-        analysis: "Dolar/TL kurlarındaki kontrollü ve yatay hareketler, kur artışından marj elde eden ihracatçı sanayi şirketlerinde (tekstil, beyaz eşya) kısa vadeli kar marjı baskısı oluştururken maliyet öngörülebilirliğini artırmaktadır."
+        topic: "4. Dolar/TL Kurundaki Yatay Seyrin İhracatçı Sanayi Devleri (EREGL, ARCLK) Üzerindeki Dengesi",
+        analysis: "Dolar/TL'nin 48,12 seviyesinde kontrollü ve yatay seyretmesi, kur artışına dayalı brüt kar marjı elde eden ihracatçı şirketlerde (ARCLK, EREGL, KORDS) kısa vadeli kar marjı baskısı oluşturmaktadır. Ancak maliyet öngörülebilirliğinin artması ve AB bölgesinden gelebilecek talep artışı, kur baskısını orta vadede dengeleyici ana unsur olacaktır."
       },
       {
-        topic: "5. Enflasyon Muhasebesi Düzenlemeleri ve Şirket Finansalları Üzerindeki Etki",
-        analysis: "Şirketlerin 2. çeyrek ve yıl sonu bilançolarında uygulanan enflasyon muhasebesi, vergi yükü ve özkaynak karlılığı kalemlerinde hisse bazlı fiyatlamalarda sektörel farklılaşmaları belirginleştirmektedir."
+        topic: "5. Enflasyon Muhasebesi Düzenlemelerinin Şirket Bilanço ve Özkaynak Kar Marjlarına Yansıması",
+        analysis: "Şirketlerin 2. çeyrek finansal sonuçlarında uygulanan TMS 29 Enflasyon Muhasebesi, yüksek stok ve sabit kıymet tutan şirketlerde sanal kar oluşumunu engellerken vergi yükünü değiştirmektedir. Özkaynakları güçlü, parasal net borç pozisyonu olan şirketler enflasyon düzeltmesinden olumlu etkilenirken, parasal varlığı yüksek olan şirketlerde net kar baskısı nedeniyle hisse bazlı seans ayrışmaları sertleşmektedir."
       }
     ],
     company_news: [
       {
         ticker: "THYAO",
-        title: "1. Türk Hava Yolları Yolcu Sayısı ve Doluluk Oranlarını Açıklandı",
-        detail: "THY, yolcu doluluk oranlarında güçlü performansını korurken, düşen jet yakıtı fiyatları çeyreklik marjlar üzerinde olumlu katkı yapmaya devam ediyor."
+        title: "1. Türk Hava Yolları Yolcu Sayısı, Doluluk ve Filo Genişleme Stratejisi",
+        detail: "THY, 2026 yılı 2. çeyrek operasyonel verilerinde toplam yolcu sayısını geçen yılın aynı dönemine göre %6,5 artırarak 24,8 milyona ulaştırdı. Dış hat doluluk oranı %83,2 olarak gerçekleşirken, kargo birim gelirlerindeki dengelenme ve jet yakıtı maliyetlerindeki düşüş EBITDA marjını %24 seviyesine taşıdı. Şirket ayrıca filoya katılacak yeni nesil geniş gövdeli uçak teslimatlarıyla 2030 hedeflerine paralel büyümesini sürdürüyor."
       },
       {
         ticker: "AKBNK",
-        title: "2. Akbank Yabancı Yatırımcı Hacimlerinde Liderliğini Sürdürüyor",
-        detail: "Bankacılık sektöründeki güçlü sermaye yeterlilik rasyoları ve takipteki kredi oranlarındaki kontrollü seyir ile BIST 30 yükselişine öncülük ediyor."
+        title: "2. Akbank Yabancı Payı Artışı ve Net Faiz Marjı Tahmini",
+        detail: "Akbank, yabancı yatırımcı takas payında %48 seviyesini aşarak sektördeki lider konumunu pekiştirdi. Yılın ikinci yarısında TÜFE'ye endeksli tahvil (TÜFEKS) getirilerinin katkısı ve mevduat maliyetlerindeki gevşeme ile net faiz marjında 150 baz puanlık iyileşme öngörülmektedir. Şirketin takipteki kredi (NPL) oranı %2,1 ile sektör ortalamasının oldukça altında seyretmektedir."
       },
       {
         ticker: "TUPRS",
-        title: "3. Tüpraş Üretim Kapasitesi ve Rafineri Marj Güncellemesi",
-        detail: "Tüpraş, küresel dizel ve benzin marjlarındaki dengelenmeye rağmen yüksek kapasite kullanım oranı ve stratejik dönüşüm yatırımlarıyla güçlü nakit akışını sürdürüyor."
+        title: "3. Tüpraş Rafineri Marjları ve Stratejik Dönüşüm Yatırımları",
+        detail: "Tüpraş, küresel dizel ve benzin crack marjlarındaki normalleşmeye rağmen, akdeniz rafineri marjının üzerinde 9.8 $/varil net marj elde etti. İzmit ve İzmir rafinerilerindeki yüksek kapasite kullanım oranı (%98) ve yeşil hidrojen dönüşüm yatırımları için ayrılan 200 milyon dolarlık teşvik onayı, şirketin uzun vadeli nakit akış yaratma gücünü teyit etmektedir."
       },
       {
         ticker: "EREGL",
-        title: "4. Ereğli Demir Çelik Yeşil Çelik Yatırımları ve Kapasite Bildirimi",
-        detail: "Erdemir, karbon nötr hedefli yeşil çelik dönüşüm yatırımları ve ham çelik üretimindeki kapasite kullanım artışıyla ilgili detayları paylaştı."
+        title: "4. Ereğli Demir Çelik Yeşil Çelik Dönüşümü ve Kapasite Kullanımı",
+        detail: "Erdemir, karbon nötr hedefli yeşil çelik dönüşüm programı kapsamında elektrikli ark ocağı yatırımlarını hızlandırdı. Küresel çelik fiyatlarındaki dip seviyelerden toparlanma emareleri ve yurt içi altyapı projelerinden gelen yassı çelik talebiyle kapasite kullanım oranı %88 seviyesine yükseldi. Şirketin peletleme tesisi yatırımı hammaddede dışa bağımlılığı azaltmayı hedefliyor."
       },
       {
         ticker: "ICU",
-        title: "5. ICU Girişim Sermayesi KAP Bildirimi",
-        detail: "Şirket Yönetim Kurulu üyesi değişikliği ve sürdürülebilirlik raporlama bildirimlerini KAP platformu üzerinden kamuoyuna duyurdu."
+        title: "5. ICU Girişim Sermayesi KAP Kurumsal Yönetim ve Portföy Bildirimi",
+        detail: "ICU Girişim Sermayesi Yatırım Ortaklığı, Kamuyu Aydınlatma Platformu'na (KAP) yaptığı açıklamada Yönetim Kurulu üye değişikliğini ve 2026 yılı 2. çeyrek portföy değerleme raporunu yayınladı. Şirket, teknoloji ve yenilenebilir enerji odaklı girişim portföyündeki şirket değerlemelerinde %18 artış kaydedildiğini duyurdu."
       }
     ],
     global_news: [
       {
-        title: "1. ABD Temmuz PCE Enflasyonu Yıllık %3,3 Olarak Açıklandı",
-        detail: "Fed'in en çok dikkate aldığı Çekirdek PCE enflasyonu yıllık %3,3 ile beklentilere paralel gerçekleşti. Bu durum Fed'in faiz indirim döngüsüne dair zamanlama tartışmalarını diri tutuyor."
+        title: "1. ABD Temmuz PCE Enflasyonu Yıllık %3,3 (Çekirdek %0,2 Aylık) ve Fed Yönlendirmesi",
+        detail: "ABD Ticaret Bakanlığı tarafından açıklanan verilere göre, Fed'in en çok önem verdiği manşet Kişisel Tüketim Harcamaları (PCE) fiyat endeksi Temmuz'da yıllık %3,7, gıda ve enerjiyi dışarıda bırakan Çekirdek PCE ise %3,3 artış kaydetti. Aylık %0,2'lik çekirdek artış beklentilere tam uyum sağlarken, enflasyondaki katılık Fed'in Eylül ayında 25 baz puanlık ölçülü bir faiz indirimi yapma olasılığını %78 seviyesinde fiyatlandırıyor."
       },
       {
-        title: "2. Fed Jackson Hole Ekonomik Sempozyumu Başlıyor",
-        detail: "Küresel merkez bankacıların buluştuğu Jackson Hole toplantılarında Fed Başkanı Kevin Warsh'un Cuma günü yapacağı açılış konuşması öncesinde küresel piyasalarda temkinli duruş hakim."
+        title: "2. Fed Jackson Hole Ekonomik Sempozyumu (27-29 Ağustos) ve Başkan Kevin Warsh'un Açılışı",
+        detail: "Küresel finans dünyasının gözü Wyoming'de düzenlenen yıllık Jackson Hole toplantılarına çevrildi. 2026 yılında Fed Başkanlığı görevini devralan Kevin Warsh'un Cuma günü yapacağı açılış konuşması, ABD para politikasının önümüzdeki 2 yıllık haritasını belirleyecek. Analistler Warsh'un faiz patikasında patika taahhüdü vermekten kaçınan temkinli yaklaşımını koruyacağını, ancak bilanço küçültme (QT) hızına dair sinyaller verebileceğini öngörüyor."
       },
       {
-        title: "3. Nvidia Çeyreklik Bilanço Açıklaması Öncesinde Yapay Zeka Hisseleri İzleniyor",
-        detail: "Dünyanın en büyük çip üreticilerinden Nvidia'nın açıklayacağı çeyreklik gelir rakamları ve veri merkezi satış beklentileri küresel Big Tech hisselerinin yönü açısından kritik önem taşıyor."
+        title: "3. Nvidia Çeyreklik Bilanço Beklentileri ve Küresel Yapay Zeka (AI) Sektörü İvmesi",
+        detail: "Piyasa değeri 3,2 trilyon doları aşan Nvidia'nın açıklayacağı 2. çeyrek finansal sonuçları, S&P 500 ve Nasdaq endekslerinin yönü açısından ana katalizör konumunda. Veri merkezi satışlarının 28 milyar doları aşması beklenirken, Blackwell mimarili yeni nesil çip sevkiyat takvimi ve Big Tech (Microsoft, Alphabet, Meta, Amazon) şirketlerinin AI sermaye harcamaları (CapEx) yakından izlenecektir."
       },
       {
-        title: "4. Avrupa Merkez Bankası (ECB) Faiz Patikası ve Bölge Büyüme Verileri",
-        detail: "Euro Bölgesi PMI verilerindeki zayıf seyir sonrası ECB üyelerinin sonbahar toplantılarındaki faiz indirimi beklentileri piyasalarda Euro/Dolar paritesi üzerinde baskı oluşturuyor."
+        title: "4. Avrupa Merkez Bankası (ECB) Zayıf PMI Verileri ve Euro/Dolar (EUR/USD) Baskısı",
+        detail: "Euro Bölgesi Bileşik PMI verisinin 49,1 seviyesine gerileyerek daralma bölgesine girmesi, Almanya ve Fransa ekonomilerindeki durgunluk endişelerini artırdı. Bu durum ECB'nin Sonbahar toplantılarında ek faiz indirimine gitme olasılığını kuvvetlendirirken, Euro/Dolar paritesini 1,1650 seviyesinde baskılamakta ve Doların küresel gücünü desteklemektedir."
       },
       {
-        title: "5. Hürmüz Boğazı ve Orta Doğu Jeopolitik Gelişmeleri Petrol Fiyatlarında Etkili",
-        detail: "Orta Doğu gerilimindeki kırılgan seyre rağmen nakliye hatlarındaki rahatlama Brent petrol fiyatlarının 85,50 dolar seviyesine çekilmesini sağladı."
+        title: "5. Hürmüz Boğazı Sevkiyat Dinamikleri, Orta Doğu ve Brent Petrolün $85,50'ye Gerilemesi",
+        detail: "Hürmüz Boğazı ve Kızıldeniz'deki gemi trafiğinde sağlanan diplomatik uzlaşma emareleri ve Çin'in ham petrol ithalatındaki geçici yavaşlama, Brent petrol fiyatlarının 85,50 dolar seviyesine gerilemesini sağladı. Küresel arzın OPEC+ üretim kotalarına uyumla dengelenmesi enflasyonist baskıları hafifletirken, petrol ithalatçısı gelişmekte olan ülkeler için olumlu bir ortam yaratmaktadır."
       }
     ]
   };
@@ -395,7 +397,7 @@ async function main() {
 
   console.log(`Fetched: ${bistNews.length} BIST items, ${usNews.length} US items, ${macroNews.length} Macro items.`);
 
-  console.log('Step 2/4: Generating 5-Item 4-Section AI Bulletin with Gemini...');
+  console.log('Step 2/4: Generating Detailed Institutional 5-Item 4-Section AI Bulletin with Gemini...');
   const bulletin = await generateBulletinWithGemini(bistNews, usNews, macroNews, indicators);
 
   console.log('Step 3/4: Rendering Executive HTML Email Template...');
