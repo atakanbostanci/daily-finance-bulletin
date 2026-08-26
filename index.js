@@ -62,11 +62,13 @@ async function fetchFeed(sources, maxPerFeed = 6) {
 
 async function fetchMarketIndicators() {
   const indicators = [
-    { name: 'USD/TRY', price: '34.25', change_pct: '+0.12%' },
-    { name: 'EUR/USD', price: '1.0850', change_pct: '-0.05%' },
-    { name: 'Ons Altın ($)', price: '2,512.40', change_pct: '+0.45%' },
-    { name: 'Brent Petrol ($)', price: '78.50', change_pct: '-0.20%' },
-    { name: 'ABD 10Y Tahvil (%)', price: '3.82%', change_pct: '-0.02%' }
+    { name: 'USD/TRY', price: '48.12 TL', change_pct: '+0.15%' },
+    { name: 'EUR/TRY', price: '56.10 TL', change_pct: '+0.10%' },
+    { name: 'Ons Altın ($)', price: '4,620.00 $', change_pct: '+0.35%' },
+    { name: 'Gram Altın', price: '7,140 TL', change_pct: '+0.40%' },
+    { name: 'Brent Petrol ($)', price: '85.50 $', change_pct: '-0.25%' },
+    { name: 'ABD 10Y Tahvil (%)', price: '4.65%', change_pct: '+0.01%' },
+    { name: 'DXY Dolar Endeksi', price: '98.90', change_pct: '+0.10%' }
   ];
   return indicators;
 }
@@ -180,8 +182,8 @@ function getFallbackBulletin(todayStr) {
       ]
     },
     macro_section: {
-      global_view: "DXY Dolar Endeksi 103,50 seviyesinde dengelenirken, ABD 10 Yıllık Tahvil Faizleri %3,82 seviyesinde seyrederken küresel merkez bankalarının faiz kararları bekleniyor.",
-      commodities_fx: "USD/TRY 34,25 civarında yatay seyrini sürdürürken, Ons Altın $2.512,40 seviyesinde tutunuyor. Brent Petrol varil başına $78,50 seviyesinden işlem görüyor."
+      global_view: "DXY Dolar Endeksi 98,90 seviyesinde yatay-pozitif seyrederken, ABD 10 Yıllık Tahvil Faizleri %4,65 seviyesinde dengelenmiş durumdadır.",
+      commodities_fx: "Dolar/TL 48,12 TL, Euro/TL 56,10 TL seviyesinde seyrederken; Ons Altın $4.620, Gram Altın 7.140 TL ve Brent Petrol varil başına $85,50 seviyesinde işlem görmektedir."
     },
     economic_calendar: [
       "15:30 - ABD Çekirdek PCE Enflasyon Verisi (Aylık %0,2 / Yıllık %3,3)",
