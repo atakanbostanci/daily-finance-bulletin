@@ -86,7 +86,7 @@ KRİTİK UZMANLIK TALİMATLARI:
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 {
-  "title": "Wall Street Açılış Öncesi Finans Bülteni - ${todayStr}",
+  "title": "🇺🇸 Amerika Finans Bülteni - ${todayStr}",
   "us_macro_news": [
     {"title": "1. En Önemli ABD Siyasi/Makroekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "2. ABD Makro/Fed Gelişme Başlığı", "detail": "Detaylı açıklama..."},
@@ -155,7 +155,7 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 function getFallbackUSBulletin(todayStr) {
   return {
-    title: `Wall Street Açılış Öncesi Finans Bülteni - ${todayStr}`,
+    title: `🇺🇸 Amerika Finans Bülteni - ${todayStr}`,
     us_macro_news: [
       {
         title: "1. ABD Temmuz PCE Enflasyonu Yıllık %3,3 Olarak Açıklandı: Fed Faiz Patikası Şekilleniyor",
@@ -322,7 +322,7 @@ async function sendMail(bulletin, htmlContent) {
       const data = await resend.emails.send({
         from: 'Finans Bülteni <onboarding@resend.dev>',
         to: [recipient],
-        subject: `🇺🇸 ${bulletin.title}`,
+        subject: bulletin.title,
         html: htmlContent
       });
       console.log(`🎉 [Resend Success] US Bulletin sent via Resend API! ID: ${data.id}`);
@@ -358,7 +358,7 @@ async function sendMail(bulletin, htmlContent) {
       const info = await transporter.sendMail({
         from: `"Wall Street Bülteni Otomasyonu" <${user}>`,
         to: recipient,
-        subject: `🇺🇸 ${bulletin.title}`,
+        subject: bulletin.title,
         html: htmlContent
       });
 

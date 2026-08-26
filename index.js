@@ -85,7 +85,7 @@ async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicator
 
   const systemPrompt = `
 Sen üst düzey bir Kurumsal Finans Uzmanı ve Hisse Senedi Araştırma (Equity Research) Direktörüsün. 
-Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Finans Bülteni hazırlayacaksın.
+Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Türkiye Finans Bültenini hazırlayacaksın.
 
 KRİTİK UZMANLIK TALİMATLARI:
 1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
@@ -94,7 +94,7 @@ KRİTİK UZMANLIK TALİMATLARI:
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 {
-  "title": "Sabah Finans Bülteni - ${todayStr}",
+  "title": "🇹🇷 Türkiye Finans Bülteni - ${todayStr}",
   "turkey_news": [
     {"title": "1. En Önemli Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı, rakamsal ve finansal arka planı içeren açıklama..."},
     {"title": "2. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
@@ -164,7 +164,7 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 function getFallbackBulletin(todayStr) {
   return {
-    title: `Sabah Finans Bülteni - ${todayStr}`,
+    title: `🇹🇷 Türkiye Finans Bülteni - ${todayStr}`,
     turkey_news: [
       {
         title: "1. Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın En Düşük Seviyesi (248 Baz Puan)",
@@ -332,7 +332,7 @@ async function sendMail(bulletin, htmlContent) {
       const data = await resend.emails.send({
         from: 'Finans Bülteni <onboarding@resend.dev>',
         to: [recipient],
-        subject: `📈 ${bulletin.title}`,
+        subject: bulletin.title,
         html: htmlContent
       });
       console.log(`🎉 [Resend Success] Email sent via Resend API! ID: ${data.id}`);
