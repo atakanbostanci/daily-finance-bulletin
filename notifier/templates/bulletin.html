@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ bulletin.title }}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 0;
+      color: #334155;
+    }
+    .container {
+      max-width: 680px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #ffffff;
+      padding: 32px 28px;
+      text-align: left;
+      border-bottom: 4px solid #f59e0b;
+    }
+    .header-tag {
+      display: inline-block;
+      background-color: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+    .header p {
+      margin: 6px 0 0 0;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .indicator-bar {
+      background-color: #0284c7;
+      color: #ffffff;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .indicator-item {
+      margin: 4px 10px;
+    }
+    .indicator-val {
+      color: #e0f2fe;
+    }
+    .content {
+      padding: 28px;
+    }
+    .card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .exec-summary {
+      background-color: #f8fafc;
+      border-left: 4px solid #f59e0b;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 0;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 10px;
+    }
+    .card-title span {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .badge-bist {
+      background-color: #ef4444;
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .badge-us {
+      background-color: #3b82f6;
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .outlook-box {
+      background-color: #eff6ff;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      color: #1e40af;
+      margin-bottom: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .calendar-item {
+      padding: 8px 12px;
+      background-color: #f8fafc;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      border-left: 3px solid #64748b;
+    }
+    .footer {
+      background-color: #f8fafc;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-tag">Kurumsal Finans & Piyasa Bülteni</div>
+      <h1>{{ bulletin.title }}</h1>
+      <p>Borsa İstanbul | Amerikan Borsaları | Küresel Makroekonomi</p>
+    </div>
+
+    <!-- Live Indicators Bar -->
+    {% if indicators %}
+    <div class="indicator-bar">
+      {% for ind in indicators %}
+        <div class="indicator-item">
+          <strong>{{ ind.name }}:</strong> <span class="indicator-val">{{ ind.price }}</span> ({{ ind.change_pct }})
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="content">
+
+      <!-- Executive Summary -->
+      <div class="card exec-summary">
+        <h3 class="card-title"><span>⚡</span> Yönetici Özeti (Günün 3 Kritik Başlığı)</h3>
+        <ul>
+          {% for item in bulletin.executive_summary %}
+            <li><strong>{{ item }}</strong></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Borsa Istanbul Section -->
+      <div class="card">
+        <h3 class="card-title"><span>🇹🇷</span> Borsa İstanbul (BIST 100) & Türkiye Gündemi</h3>
+        <div class="outlook-box">
+          <strong>Açılış Beklentisi:</strong> {{ bulletin.bist_section.opening_outlook }}
+        </div>
+        <ul>
+          {% for item in bulletin.bist_section.highlights %}
+            <li><span class="badge-bist">BIST</span>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- US Market Section -->
+      <div class="card">
+        <h3 class="card-title"><span>🇺🇸</span> Amerikan Borsaları (NYSE / NASDAQ) & Wall Street</h3>
+        <div class="outlook-box" style="background-color: #f0fdf4; color: #166534;">
+          <strong>Vadeli & Seans Öncesi:</strong> {{ bulletin.us_market_section.futures_outlook }}
+        </div>
+        <ul>
+          {% for item in bulletin.us_market_section.highlights %}
+            <li><span class="badge-us">US MARKET</span>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Global Macro Section -->
+      <div class="card">
+        <h3 class="card-title"><span>🌍</span> Küresel Makroekonomi, Emtia & FX</h3>
+        <p style="font-size: 14px; line-height: 1.5; margin-bottom: 12px;">
+          <strong>Küresel Görünüm:</strong> {{ bulletin.macro_section.global_view }}
+        </p>
+        <p style="font-size: 14px; line-height: 1.5; margin: 0;">
+          <strong>Döviz & Emtialar:</strong> {{ bulletin.macro_section.commodities_fx }}
+        </p>
+      </div>
+
+      <!-- Economic Calendar -->
+      <div class="card">
+        <h3 class="card-title"><span>📅</span> Günün Takip Edilecek Ekonomik Takvimi</h3>
+        {% for item in bulletin.economic_calendar %}
+          <div class="calendar-item">📌 {{ item }}</div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Bu bülten Kurumsal Finans Uzmanları için her sabah 08:00'de Yapay Zeka otomasyonu ile derlenip gönderilmektedir.</p>
+      <p>© {{ now_year }} Daily Finance Bulletin | Tüm hakları saklıdır.</p>
+    </div>
+  </div>
+
+</body>
+</html>

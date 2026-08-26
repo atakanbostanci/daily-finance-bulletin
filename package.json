@@ -1,0 +1,20 @@
+{
+  "name": "daily-finance-bulletin",
+  "version": "1.0.0",
+  "description": "Kurumsal finans uzmanları için her sabah saat **08:00'de** otomatik çalışan, **Borsa İstanbul (BIST 100)**, **Amerikan Borsaları (NYSE/NASDAQ)** ve **Küresel Makroekonomi** gelişmelerini Yapay Zeka (Gemini) ile analiz ederek e-posta kutunuza ulaştıran bulut otomasyon projesi.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^17.4.2",
+    "nodemailer": "^9.0.5",
+    "resend": "^6.24.0",
+    "rss-parser": "^3.13.0"
+  }
+}
