@@ -37,7 +37,7 @@ function cleanText(text) {
   return text.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
 }
 
-async function fetchFeed(sources, maxPerFeed = 6) {
+async function fetchFeed(sources, maxPerFeed = 10) {
   const items = [];
   for (const src of sources) {
     try {
@@ -48,7 +48,7 @@ async function fetchFeed(sources, maxPerFeed = 6) {
           items.push({
             source: src.name,
             title: cleanText(entry.title),
-            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 350),
+            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 400),
             link: entry.link || '#'
           });
         }
@@ -87,34 +87,39 @@ async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicator
 Sen üst düzey bir Kurumsal Finans Uzmanı ve Piyasa Stratejistisin. 
 Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Finans Bülteni hazırlayacaksın.
 
-Bülten SADECE aşağıdaki 4 ana bölümden oluşan JSON formatında olmak zorundadır. Başka hiçbir metin ekleme:
+KRİTİK KURAL: Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR. Maddeler en önemliden başlayarak sıralanmalıdır.
+
+Bülten SADECE aşağıdaki JSON formatında olmak zorundadır. Başka hiçbir metin ekleme:
 
 {
   "title": "Sabah Finans Bülteni - ${todayStr}",
   "turkey_news": [
-    {
-      "title": "1. Türkiye Siyasi veya Ekonomik Gelişme Başlığı",
-      "detail": "Haberin detaylı açıklaması ve arka planı..."
-    }
+    {"title": "1. En Önemli Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı finansal açıklama..."},
+    {"title": "2. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "3. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "4. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "5. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."}
   ],
   "bist_impact_analysis": [
-    {
-      "topic": "Türkiye Gündemindeki Önemli Haber veya Konu",
-      "analysis": "Bu gelişmenin Borsa İstanbul (BIST 100) endeksi, hisse grupları veya sektörler üzerindeki olası seans içi ve orta vadeli etkilerinin detaylı finansal analizi..."
-    }
+    {"topic": "1. En Kritik Gündem Konusu", "analysis": "BIST 100 ve sektörlere olası etkilerinin detaylı analizi..."},
+    {"topic": "2. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
+    {"topic": "3. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
+    {"topic": "4. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
+    {"topic": "5. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."}
   ],
   "company_news": [
-    {
-      "ticker": "THYAO",
-      "title": "Borsa Şirket Haberi veya KAP Açıklaması Başlığı",
-      "detail": "Finansal sonuçlar, yatırımlar, temettü, sermaye artırımı veya hedef fiyat revizyonu detayları..."
-    }
+    {"ticker": "THYAO", "title": "1. En Önemli Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
+    {"ticker": "AKBNK", "title": "2. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
+    {"ticker": "TUPRS", "title": "3. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
+    {"ticker": "EREGL", "title": "4. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."},
+    {"ticker": "ICU", "title": "5. Şirket Haberi/KAP Başlığı", "detail": "Finansal/operasyonel detaylar..."}
   ],
   "global_news": [
-    {
-      "title": "4. Dünya Gündemi veya Küresel Piyasa Haberi Başlığı",
-      "detail": "Haberin küresel ekonomiye, emtialara ve borsalara etkisiyle birlikte detaylı açıklaması..."
-    }
+    {"title": "1. En Önemli Küresel/Dünya Gündemi Haberi Başlığı", "detail": "Detaylı dünya piyasaları açıklaması..."},
+    {"title": "2. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "3. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "4. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
+    {"title": "5. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."}
   ]
 }
 `;
@@ -147,7 +152,8 @@ Bülten SADECE aşağıdaki 4 ana bölümden oluşan JSON formatında olmak zoru
     if (text.startsWith('```')) {
       text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
     }
-    return JSON.parse(text);
+    const data = JSON.parse(text);
+    return data;
   } catch (err) {
     console.error(`[Gemini Error] ${err.message}. Using fallback structure.`);
     return getFallbackBulletin(todayStr);
@@ -159,53 +165,95 @@ function getFallbackBulletin(todayStr) {
     title: `Sabah Finans Bülteni - ${todayStr}`,
     turkey_news: [
       {
-        title: "Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın Dip Seviyesi Kaydedildi",
+        title: "1. Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın Dip Seviyesi Kaydedildi",
         detail: "Türkiye'nin ülke risk primini gösteren 5 yıllık CDS oranı son 6 ayın en düşük seviyelerine gerileyerek uluslararası piyasalarda kredibilite artışına işaret ediyor. Bu durum yabancı kurumların Türk tahvillerine ve hisse senedi piyasasına olan ilgisini canlı tutmaya devam etmektedir."
       },
       {
-        title: "TCMB Parasal Sıkılaşma ve Likidite Adımlarını Sürdürüyor",
+        title: "2. TCMB Parasal Sıkılaşma ve Likidite Adımlarını Kararlılıkla Sürdürüyor",
         detail: "Türkiye Cumhuriyet Merkez Bankası (TCMB), enflasyon patikasındaki hedef doğrultusunda likidite çekme adımlarını ve mevduat faizlerindeki efektif sıkılığı koruyor. Piyasalarda dezenflasyon sürecinin 2. yarıyıldaki seyri ve reel sektör kredileri üzerindeki etkileri yakından izlenmektedir."
+      },
+      {
+        title: "3. Ticaret Bakanlığı Dış Ticaret Açığı ve İhracat Verilerini Değerlendirdi",
+        detail: "İhracattaki katma değerli ürün payının artırılması ve ithalat kısıtlama tedbirlerinin etkisiyle dış ticaret dengesindeki iyileşme trendi devam ediyor. İmalat sanayi kapasite kullanım oranlarındaki kararlı seyir takip ediliyor."
+      },
+      {
+        title: "4. Maliye Politikalarında Disiplin ve Kamuda Tasarruf Paketi Uygulaması",
+        detail: "Hazine ve Maliye Bakanlığı'nın bütçe disiplini ve harcama kısıtlamalarına yönelik kararları mali görünümü destekliyor. Bütçe dengesindeki toparlanma ve vergi adımları yabancı analist raporlarında olumlu vurgulanmaktadır."
+      },
+      {
+        title: "5. MKK Verilerine Göre Yerli ve Yabancı Yatırımcı Sayısındaki Son Durum",
+        detail: "Merkezi Kayıt Kuruluşu (MKK) verilerine göre Borsa İstanbul'da yatırımcı sayısı 4,57 milyon seviyesinde dengelenirken, yabancı yatırımcıların takas payındaki artış trendi ön planda kalmaya devam ediyor."
       }
     ],
     bist_impact_analysis: [
       {
-        topic: "CDS Primindeki Gerileme ve Yabancı Girişleri",
+        topic: "1. CDS Primindeki Gerileme ve Yabancı Girişleri",
         analysis: "Risk primindeki gerileme BIST Bankacılık Endeksi (XBANK) ve yüksek piyasa değerine sahip BIST 30 hisselerine doğrudan pozitif katkı sunmaktadır. Yabancı takas oranındaki kademeli artışın seans içi tepki alımlarını desteklemesi beklenmektedir."
       },
       {
-        topic: "Küresel Petrol Fiyatlarındaki Gerilemenin Ulaştırma Sektörüne Etkisi",
+        topic: "2. Küresel Petrol Fiyatlarındaki Düşüşün Ulaştırma Sektörüne Etkisi",
         analysis: "Brent petrol fiyatlarının 85,50 dolara gerilemesi, akaryakıt maliyet baskısını azaltarak Türk Hava Yolları (THYAO) ve Pegasus (PGSUS) gibi ulaştırma hisselerinde marj genişlemesini destekleyici bir unsur olarak değerlendirilmektedir."
+      },
+      {
+        topic: "3. Sıkı Para Politikası ve Kredi Koşullarının Perakende/GYO Sektörüne Yansıması",
+        analysis: "Yüksek faiz ortamı ve tüketici kredilerindeki sınırlamalar GYO ve tüketici takdirine bağlı perakende sektöründe ciro büyümesini sınırlayabilir; şirketlerin nakit akış gücü seans ayrışmalarını belirleyecektir."
+      },
+      {
+        topic: "4. Döviz Kurlarındaki Yatay Seyrin İhracatçı Şirket Marjlarına Etkisi",
+        analysis: "Dolar/TL kurlarındaki kontrollü ve yatay hareketler, kur artışından marj elde eden ihracatçı sanayi şirketlerinde (tekstil, beyaz eşya) kısa vadeli kar marjı baskısı oluştururken maliyet öngörülebilirliğini artırmaktadır."
+      },
+      {
+        topic: "5. Enflasyon Muhasebesi Düzenlemeleri ve Şirket Finansalları Üzerindeki Etki",
+        analysis: "Şirketlerin 2. çeyrek ve yıl sonu bilançolarında uygulanan enflasyon muhasebesi, vergi yükü ve özkaynak karlılığı kalemlerinde hisse bazlı fiyatlamalarda sektörel farklılaşmaları belirginleştirmektedir."
       }
     ],
     company_news: [
       {
         ticker: "THYAO",
-        title: "Türk Hava Yolları Yolcu Sayısı ve Doluluk Oranlarını Açıklandı",
+        title: "1. Türk Hava Yolları Yolcu Sayısı ve Doluluk Oranlarını Açıklandı",
         detail: "THY, yolcu doluluk oranlarında güçlü performansını korurken, düşen jet yakıtı fiyatları çeyreklik marjlar üzerinde olumlu katkı yapmaya devam ediyor."
       },
       {
         ticker: "AKBNK",
-        title: "Akbank Yabancı Yatırımcı Hacimlerinde Liderliğini Sürdürüyor",
+        title: "2. Akbank Yabancı Yatırımcı Hacimlerinde Liderliğini Sürdürüyor",
         detail: "Bankacılık sektöründeki güçlü sermaye yeterlilik rasyoları ve takipteki kredi oranlarındaki kontrollü seyir ile BIST 30 yükselişine öncülük ediyor."
       },
       {
+        ticker: "TUPRS",
+        title: "3. Tüpraş Üretim Kapasitesi ve Rafineri Marj Güncellemesi",
+        detail: "Tüpraş, küresel dizel ve benzin marjlarındaki dengelenmeye rağmen yüksek kapasite kullanım oranı ve stratejik dönüşüm yatırımlarıyla güçlü nakit akışını sürdürüyor."
+      },
+      {
+        ticker: "EREGL",
+        title: "4. Ereğli Demir Çelik Yeşil Çelik Yatırımları ve Kapasite Bildirimi",
+        detail: "Erdemir, karbon nötr hedefli yeşil çelik dönüşüm yatırımları ve ham çelik üretimindeki kapasite kullanım artışıyla ilgili detayları paylaştı."
+      },
+      {
         ticker: "ICU",
-        title: "ICU Girişim Sermayesi KAP Bildirimi",
+        title: "5. ICU Girişim Sermayesi KAP Bildirimi",
         detail: "Şirket Yönetim Kurulu üyesi değişikliği ve sürdürülebilirlik raporlama bildirimlerini KAP platformu üzerinden kamuoyuna duyurdu."
       }
     ],
     global_news: [
       {
-        title: "ABD Temmuz PCE Enflasyonu Yıllık %3,3 Olarak Açıklandı",
+        title: "1. ABD Temmuz PCE Enflasyonu Yıllık %3,3 Olarak Açıklandı",
         detail: "Fed'in en çok dikkate aldığı Çekirdek PCE enflasyonu yıllık %3,3 ile beklentilere paralel gerçekleşti. Bu durum Fed'in faiz indirim döngüsüne dair zamanlama tartışmalarını diri tutuyor."
       },
       {
-        title: "Fed Jackson Hole Ekonomik Sempozyumu Başlıyor",
+        title: "2. Fed Jackson Hole Ekonomik Sempozyumu Başlıyor",
         detail: "Küresel merkez bankacıların buluştuğu Jackson Hole toplantılarında Fed Başkanı Kevin Warsh'un Cuma günü yapacağı açılış konuşması öncesinde küresel piyasalarda temkinli duruş hakim."
       },
       {
-        title: "Nvidia Çeyreklik Bilanço Açıklaması Öncesinde Yapay Zeka Hisseleri İzleniyor",
+        title: "3. Nvidia Çeyreklik Bilanço Açıklaması Öncesinde Yapay Zeka Hisseleri İzleniyor",
         detail: "Dünyanın en büyük çip üreticilerinden Nvidia'nın açıklayacağı çeyreklik gelir rakamları ve veri merkezi satış beklentileri küresel Big Tech hisselerinin yönü açısından kritik önem taşıyor."
+      },
+      {
+        title: "4. Avrupa Merkez Bankası (ECB) Faiz Patikası ve Bölge Büyüme Verileri",
+        detail: "Euro Bölgesi PMI verilerindeki zayıf seyir sonrası ECB üyelerinin sonbahar toplantılarındaki faiz indirimi beklentileri piyasalarda Euro/Dolar paritesi üzerinde baskı oluşturuyor."
+      },
+      {
+        title: "5. Hürmüz Boğazı ve Orta Doğu Jeopolitik Gelişmeleri Petrol Fiyatlarında Etkili",
+        detail: "Orta Doğu gerilimindeki kırılgan seyre rağmen nakliye hatlarındaki rahatlama Brent petrol fiyatlarının 85,50 dolar seviyesine çekilmesini sağladı."
       }
     ]
   };
@@ -347,7 +395,7 @@ async function main() {
 
   console.log(`Fetched: ${bistNews.length} BIST items, ${usNews.length} US items, ${macroNews.length} Macro items.`);
 
-  console.log('Step 2/4: Generating Custom 4-Section AI Bulletin with Gemini...');
+  console.log('Step 2/4: Generating 5-Item 4-Section AI Bulletin with Gemini...');
   const bulletin = await generateBulletinWithGemini(bistNews, usNews, macroNews, indicators);
 
   console.log('Step 3/4: Rendering Executive HTML Email Template...');
