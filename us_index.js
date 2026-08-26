@@ -359,8 +359,8 @@ function renderUSHtml(bulletin, indicators) {
   const templatePath = path.join(__dirname, 'notifier', 'templates', 'us_bulletin.html');
   let html = fs.readFileSync(templatePath, 'utf8');
 
-  html = html.replace('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
-  html = html.replace('{{ NOW_YEAR }}', () => new Date().getFullYear());
+  html = html.replaceAll('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
+  html = html.replaceAll('{{ NOW_YEAR }}', () => new Date().getFullYear());
 
   // Render Section 1: us_macro_news
   const macroHtml = (bulletin.us_macro_news || []).map(i => `
@@ -369,7 +369,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- US_MACRO_NEWS_PLACEHOLDER -->', () => macroHtml);
+  html = html.replaceAll('<!-- US_MACRO_NEWS_PLACEHOLDER -->', () => macroHtml);
 
   // Render Section 2: us_market_impact
   const impactHtml = (bulletin.us_market_impact || []).map(i => `
@@ -378,7 +378,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="impact-text"><strong>Olası Seans İçi Etki:</strong> ${i.analysis}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- US_MARKET_IMPACT_PLACEHOLDER -->', () => impactHtml);
+  html = html.replaceAll('<!-- US_MARKET_IMPACT_PLACEHOLDER -->', () => impactHtml);
 
   // Render Section 3: us_company_news
   const companyHtml = (bulletin.us_company_news || []).map(i => `
@@ -389,7 +389,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- US_COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
+  html = html.replaceAll('<!-- US_COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
 
   // Render Section 4: us_global_news
   const globalHtml = (bulletin.us_global_news || []).map(i => `
@@ -398,7 +398,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- US_GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
+  html = html.replaceAll('<!-- US_GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
 
   // Render Section 5: watchlist_stocks
   const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => `
@@ -413,7 +413,7 @@ function renderUSHtml(bulletin, indicators) {
       </div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- WATCHLIST_STOCKS_PLACEHOLDER -->', () => watchlistHtml);
+  html = html.replaceAll('<!-- WATCHLIST_STOCKS_PLACEHOLDER -->', () => watchlistHtml);
 
   // Render indicators bar
   const indHtml = (indicators || []).map(ind => `
@@ -421,7 +421,7 @@ function renderUSHtml(bulletin, indicators) {
       <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
     </div>
   `).join('\n');
-  html = html.replace('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
+  html = html.replaceAll('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
 }

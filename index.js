@@ -266,8 +266,8 @@ function renderHtml(bulletin, indicators) {
   let html = fs.readFileSync(templatePath, 'utf8');
 
   // Title & year
-  html = html.replace('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇹🇷 Türkiye Finans Bülteni');
-  html = html.replace('{{ NOW_YEAR }}', () => new Date().getFullYear());
+  html = html.replaceAll('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇹🇷 Türkiye Finans Bülteni');
+  html = html.replaceAll('{{ NOW_YEAR }}', () => new Date().getFullYear());
 
   // Render Section 1: turkey_news
   const turkeyHtml = (bulletin.turkey_news || []).map(i => `
@@ -276,7 +276,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- TURKEY_NEWS_PLACEHOLDER -->', () => turkeyHtml);
+  html = html.replaceAll('<!-- TURKEY_NEWS_PLACEHOLDER -->', () => turkeyHtml);
 
   // Render Section 2: bist_impact_analysis
   const impactHtml = (bulletin.bist_impact_analysis || []).map(i => `
@@ -285,7 +285,7 @@ function renderHtml(bulletin, indicators) {
       <div class="impact-text"><strong>Olası Borsa Etkisi:</strong> ${i.analysis}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- BIST_IMPACT_PLACEHOLDER -->', () => impactHtml);
+  html = html.replaceAll('<!-- BIST_IMPACT_PLACEHOLDER -->', () => impactHtml);
 
   // Render Section 3: company_news
   const companyHtml = (bulletin.company_news || []).map(i => `
@@ -296,7 +296,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
+  html = html.replaceAll('<!-- COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
 
   // Render Section 4: global_news
   const globalHtml = (bulletin.global_news || []).map(i => `
@@ -305,7 +305,7 @@ function renderHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace('<!-- GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
+  html = html.replaceAll('<!-- GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
 
   // Render indicators bar
   const indHtml = (indicators || []).map(ind => `
@@ -313,7 +313,7 @@ function renderHtml(bulletin, indicators) {
       <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
     </div>
   `).join('\n');
-  html = html.replace('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
+  html = html.replaceAll('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
 }
