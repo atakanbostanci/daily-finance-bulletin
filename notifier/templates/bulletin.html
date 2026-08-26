@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ bulletin.title }}</title>
+  <title>{{ BULLETIN_TITLE }}</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -158,68 +158,38 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <div class="header-tag">VIP Kurumsal Finans Bülteni</div>
-      <h1>{{ bulletin.title }}</h1>
+      <div class="header-tag">Türkiye Finans Bülteni (08:00)</div>
+      <h1>{{ BULLETIN_TITLE }}</h1>
       <p>Türkiye Siyasi & Ekonomik Gündemi | Borsa Analizi | Şirket Haberleri | Dünya Piyasaları</p>
     </div>
 
     <!-- Live Indicators Bar -->
-    {% if indicators %}
-    <div class="indicator-bar">
-      {% for ind in indicators %}
-        <div class="indicator-item">
-          <strong>{{ ind.name }}:</strong> <span class="indicator-val">{{ ind.price }}</span> ({{ ind.change_pct }})
-        </div>
-      {% endfor %}
-    </div>
-    {% endif %}
+    <!-- INDICATORS_PLACEHOLDER -->
 
     <div class="content">
 
       <!-- Bölüm 1: Türkiye Siyasi & Ekonomik Gündemi -->
       <div class="card">
         <h3 class="card-title"><span>🇹🇷</span> 1. Türkiye Siyasi & Ekonomik Gündemi (Önemli Haberler ve Detayları)</h3>
-        {% for item in bulletin.turkey_news %}
-          <div class="news-item">
-            <div class="news-item-title">📌 {{ item.title }}</div>
-            <div class="news-item-detail">{{ item.detail }}</div>
-          </div>
-        {% endfor %}
+        <!-- TURKEY_NEWS_PLACEHOLDER -->
       </div>
 
       <!-- Bölüm 2: Türkiye Gündeminin Borsa İstanbul'a Olası Etkileri & Analiz -->
       <div class="card">
         <h3 class="card-title"><span>📊</span> 2. Türkiye Gündeminin Borsa İstanbul'a Olası Etkileri ve Analizi</h3>
-        {% for item in bulletin.bist_impact_analysis %}
-          <div class="impact-box">
-            <div class="impact-title">⚡ {{ item.topic }}</div>
-            <div class="impact-text"><strong>Olası Borsa Etkisi:</strong> {{ item.analysis }}</div>
-          </div>
-        {% endfor %}
+        <!-- BIST_IMPACT_PLACEHOLDER -->
       </div>
 
       <!-- Bölüm 3: Borsada İşlem Gören Şirketler İçin Önemli Haberler -->
       <div class="card">
         <h3 class="card-title"><span>🏢</span> 3. Borsa İstanbul Şirket Haberleri & KAP Gelişmeleri</h3>
-        {% for item in bulletin.company_news %}
-          <div class="news-item">
-            <div class="news-item-title">
-              {% if item.ticker %}<span class="company-badge">{{ item.ticker }}</span>{% endif %}{{ item.title }}
-            </div>
-            <div class="news-item-detail">{{ item.detail }}</div>
-          </div>
-        {% endfor %}
+        <!-- COMPANY_NEWS_PLACEHOLDER -->
       </div>
 
       <!-- Bölüm 4: Dünya Gündeminde Yer Alan Önemli Haberler -->
       <div class="card">
         <h3 class="card-title"><span>🌍</span> 4. Dünya Gündemi & Küresel Piyasalar (Önemli Haberler ve Detayları)</h3>
-        {% for item in bulletin.global_news %}
-          <div class="news-item">
-            <div class="news-item-title">🌐 {{ item.title }}</div>
-            <div class="news-item-detail">{{ item.detail }}</div>
-          </div>
-        {% endfor %}
+        <!-- GLOBAL_NEWS_PLACEHOLDER -->
       </div>
 
     </div>
@@ -227,7 +197,7 @@
     <!-- Footer -->
     <div class="footer">
       <p>Bu bülten her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanları için özel Yapay Zeka otomasyonu ile derlenip gönderilmektedir.</p>
-      <p>© {{ now_year }} Daily Finance Bulletin | Tüm hakları saklıdır.</p>
+      <p>© {{ NOW_YEAR }} Daily Finance Bulletin | Tüm hakları saklıdır.</p>
     </div>
   </div>
 

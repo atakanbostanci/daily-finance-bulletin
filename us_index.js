@@ -336,21 +336,20 @@ function getFallbackUSBulletin(todayStr) {
       },
       {
         ticker: "AMZN",
-        title: "Amazon AWS Bulut Marj Genişlemesi ve E-Ticaret Lojistik Otomasyonu",
-        detail: "Amazon Web Services (AWS) yıllıklandırılmış büyüme oranını %19'a çıkarırken, teslimat merkezlerindeki robotik otomasyon paket başı birim lojistik maliyetlerini %14 düşürdü.",
-        forecast: "Pozitif (Kademeli Yükseliş): AWS marjlarındaki toparlanma ve düşen lojistik giderleri ile hissenin seans içi $185 direnç seviyesini test etmesi ve %1,2 - %2,0 prim yapması öngörülmektedir."
+"detail": "Amazon Web Services (AWS) yıllıklandırılmış büyüme oranını %19'a çıkarırken, teslimat merkezlerindeki robotik otomasyon paket başı birim lojistik maliyetlerini %14 düşürdü.",
+        "forecast": "Pozitif (Kademeli Yükseliş): AWS marjlarındaki toparlanma ve düşen lojistik giderleri ile hissenin seans içi $185 direnç seviyesini test etmesi ve %1,2 - %2,0 prim yapması öngörülmektedir."
       },
       {
-        ticker: "ADBE",
-        title: "Adobe Firefly Üretken Yapay Zeka Kullanım Rakamları ve Kurumsal Lisans Güncellemeleri",
-        detail: "Adobe, Firefly yapay zeka aracı ile üretilen görsel sayısının 12 milyarı aştığını ve Creative Cloud kurumsal abonelik yenileme oranlarının %94 ile rekor kırdığını açıkladı.",
-        forecast: "Pozitif-Nötr (Direnç Testi): Yapay zeka monetization (paraya çevirme) başarısı hisseyi desteklemekle birlikte, genel yazılım çarpanlarındaki temkin nedeniyle seans içi %0,8 - %1,5 arası sınırlı yükseliş öngörülmektedir."
+        "ticker": "ADBE",
+        "title": "Adobe Firefly Üretken Yapay Zeka Kullanım Rakamları ve Kurumsal Lisans Güncellemeleri",
+        "detail": "Adobe, Firefly yapay zeka aracı ile üretilen görsel sayısının 12 milyarı aştığını ve Creative Cloud kurumsal abonelik yenileme oranlarının %94 ile rekor kırdığını açıkladı.",
+        "forecast": "Pozitif-Nötr (Direnç Testi): Yapay zeka monetization (paraya çevirme) başarısı hisseyi desteklemekle birlikte, genel yazılım çarpanlarındaki temkin nedeniyle seans içi %0,8 - %1,5 arası sınırlı yükseliş öngörülmektedir."
       },
       {
-        ticker: "AAPL",
-        title: "Apple iPhone 18 Serisi Tedarik Siparişleri ve Apple Intelligence Yayılımı",
-        detail: "Apple, Asya'daki tedarikçilerine yeni nesil iPhone üretimi için 90 milyon adedin üzerinde ilk sipariş verdiğini ve Apple Intelligence özelliklerinin Avrupa lansman takvimini netleştirdiğini duyurdu.",
-        forecast: "Pozitif (İstikrarlı Alımlar): Güçlü cihaz yenileme döngüsü beklentisiyle AAPL hissesinde seans açılışından itibaren %0,8 - %1,5 bandında istikrarlı alıcılı seyir öngörülmektedir."
+        "ticker": "AAPL",
+        "title": "Apple iPhone 18 Serisi Tedarik Siparişleri ve Apple Intelligence Yayılımı",
+        "detail": "Apple, Asya'daki tedarikçilerine yeni nesil iPhone üretimi için 90 milyon adedin üzerinde ilk sipariş verdiğini ve Apple Intelligence özelliklerinin Avrupa lansman takvimini netleştirdiğini duyurdu.",
+        "forecast": "Pozitif (İstikrarlı Alımlar): Güçlü cihaz yenileme döngüsü beklentisiyle AAPL hissesinde seans açılışından itibaren %0,8 - %1,5 bandında istikrarlı alıcılı seyir öngörülmektedir."
       }
     ]
   };
@@ -360,8 +359,8 @@ function renderUSHtml(bulletin, indicators) {
   const templatePath = path.join(__dirname, 'notifier', 'templates', 'us_bulletin.html');
   let html = fs.readFileSync(templatePath, 'utf8');
 
-  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
-  html = html.replace(/\{\{\s*now_year\s*\}\}/g, () => new Date().getFullYear());
+  html = html.replace('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
+  html = html.replace('{{ NOW_YEAR }}', () => new Date().getFullYear());
 
   // Render Section 1: us_macro_news
   const macroHtml = (bulletin.us_macro_news || []).map(i => `
@@ -370,7 +369,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_macro_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => macroHtml);
+  html = html.replace('<!-- US_MACRO_NEWS_PLACEHOLDER -->', () => macroHtml);
 
   // Render Section 2: us_market_impact
   const impactHtml = (bulletin.us_market_impact || []).map(i => `
@@ -379,7 +378,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="impact-text"><strong>Olası Seans İçi Etki:</strong> ${i.analysis}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_market_impact\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => impactHtml);
+  html = html.replace('<!-- US_MARKET_IMPACT_PLACEHOLDER -->', () => impactHtml);
 
   // Render Section 3: us_company_news
   const companyHtml = (bulletin.us_company_news || []).map(i => `
@@ -390,7 +389,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => companyHtml);
+  html = html.replace('<!-- US_COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
 
   // Render Section 4: us_global_news
   const globalHtml = (bulletin.us_global_news || []).map(i => `
@@ -399,7 +398,7 @@ function renderUSHtml(bulletin, indicators) {
       <div class="news-item-detail">${i.detail}</div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, () => globalHtml);
+  html = html.replace('<!-- US_GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
 
   // Render Section 5: watchlist_stocks
   const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => `
@@ -414,7 +413,7 @@ function renderUSHtml(bulletin, indicators) {
       </div>
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*for stock in bulletin\.watchlist_stocks\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, watchlistHtml);
+  html = html.replace('<!-- WATCHLIST_STOCKS_PLACEHOLDER -->', () => watchlistHtml);
 
   // Render indicators bar
   const indHtml = (indicators || []).map(ind => `
@@ -422,7 +421,7 @@ function renderUSHtml(bulletin, indicators) {
       <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
     </div>
   `).join('\n');
-  html = html.replace(/\{%\s*if indicators\s*%\}([\s\S]*?)\{%\s*endif\s*%\}/g, `<div class="indicator-bar">${indHtml}</div>`);
+  html = html.replace('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
 }
