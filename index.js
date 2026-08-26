@@ -85,52 +85,48 @@ async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicator
 
   const systemPrompt = `
 Sen üst düzey bir Kurumsal Finans Uzmanı ve Piyasa Stratejistisin. 
-Sana sağlanan güncel finans haberlerini inceleyerek, bir finans profesyonelinin sabah saat 08:00'de kahvesini içerken okuyacağı, 3 dakikada tüm piyasa dinamiklerine hakim olmasını sağlayacak VIP Günlük Finans Bülteni hazırlayacaksın.
+Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Finans Bülteni hazırlayacaksın.
 
-Bülteni SADECE aşağıdaki JSON formatında çıktı olarak ver. Başka hiçbir açıklama yazma:
+Bülten SADECE aşağıdaki 4 ana bölümden oluşan JSON formatında olmak zorundadır. Başka hiçbir metin ekleme:
 
 {
   "title": "Sabah Finans Bülteni - ${todayStr}",
-  "executive_summary": [
-    "Bugünün piyasalarını etkileyecek 1. en kritik gelişme ve finansal etkisi.",
-    "2. kritik gelişme ve beklentiler.",
-    "3. kritik gelişme."
+  "turkey_news": [
+    {
+      "title": "1. Türkiye Siyasi veya Ekonomik Gelişme Başlığı",
+      "detail": "Haberin detaylı açıklaması ve arka planı..."
+    }
   ],
-  "bist_section": {
-    "opening_outlook": "BIST 100 güne nasıl bir seyirle başlaması bekleniyor?",
-    "highlights": [
-      "Önemli KAP açıklaması veya hisse/sektör gelişmesi 1",
-      "Hisse/sektör gelişmesi 2",
-      "Temettü, sermaye artırımı veya hedef fiyat revizyonu haberi 3"
-    ]
-  },
-  "us_market_section": {
-    "futures_outlook": "ABD vadeli endeksleri (S&P 500, Nasdaq, Dow) ve seans öncesi görünüm.",
-    "highlights": [
-      "Wall Street / Bilanço / Şirket haberi 1",
-      "Big Tech veya Fed açıklaması 2",
-      "Piyasa öncesi öne çıkan hisse hareketleri 3"
-    ]
-  },
-  "macro_section": {
-    "global_view": "Küresel makroekonomi, enflasyon, merkez bankaları ve tahvil faizleri analizi.",
-    "commodities_fx": "Dolar/TL, Euro/Dolar, Ons Altın ve Brent Petrol analizi ve beklentiler."
-  },
-  "economic_calendar": [
-    "Günün takip edilecek kritik verisi 1 (Saat - Ülke - Beklenti)",
-    "Kritik veri veya konuşma 2"
+  "bist_impact_analysis": [
+    {
+      "topic": "Türkiye Gündemindeki Önemli Haber veya Konu",
+      "analysis": "Bu gelişmenin Borsa İstanbul (BIST 100) endeksi, hisse grupları veya sektörler üzerindeki olası seans içi ve orta vadeli etkilerinin detaylı finansal analizi..."
+    }
+  ],
+  "company_news": [
+    {
+      "ticker": "THYAO",
+      "title": "Borsa Şirket Haberi veya KAP Açıklaması Başlığı",
+      "detail": "Finansal sonuçlar, yatırımlar, temettü, sermaye artırımı veya hedef fiyat revizyonu detayları..."
+    }
+  ],
+  "global_news": [
+    {
+      "title": "4. Dünya Gündemi veya Küresel Piyasa Haberi Başlığı",
+      "detail": "Haberin küresel ekonomiye, emtialara ve borsalara etkisiyle birlikte detaylı açıklaması..."
+    }
   ]
 }
 `;
 
   if (!apiKey || apiKey.includes('your_gemini_api_key')) {
-    console.log('[Gemini] API Key missing. Using standard fallback structure.');
+    console.log('[Gemini] API Key missing. Using standard structured fallback.');
     return getFallbackBulletin(todayStr);
   }
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const modelNames = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro-latest'];
+    const modelNames = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
     let text = null;
 
     for (const mName of modelNames) {
@@ -140,7 +136,7 @@ Bülteni SADECE aşağıdaki JSON formatında çıktı olarak ver. Başka hiçbi
         text = result.response.text().trim();
         if (text) break;
       } catch (e) {
-        // try next model
+        // try next
       }
     }
 
@@ -161,35 +157,56 @@ Bülteni SADECE aşağıdaki JSON formatında çıktı olarak ver. Başka hiçbi
 function getFallbackBulletin(todayStr) {
   return {
     title: `Sabah Finans Bülteni - ${todayStr}`,
-    executive_summary: [
-      "BIST 100 endeksi 14.473,42 puan seviyesinden günü tamamlarken, Türkiye 5 yıllık CDS primlerinin 6 ayın en düşük seviyelerine gerilemesi iç piyasaya olumlu destek sunuyor.",
-      "ABD'de Temmuz ayı Manşet PCE Enflasyonu yıllık %3,7 (Çekirdek PCE %3,3) ile beklentilerin hafif üzerinde gerçekleşti; piyasalar Fed Jackson Hole Sempozyumu'na kilitlendi.",
-      "Nvidia çeyreklik bilanço açıklaması öncesinde yapay zeka ve teknoloji hisselerinde temkinli seyir hakimken, Ons Altın $2.512 seviyesinde güçlü duruşunu koruyor."
+    turkey_news: [
+      {
+        title: "Türkiye 5 Yıllık CDS Primlerinde Son 6 Ayın Dip Seviyesi Kaydedildi",
+        detail: "Türkiye'nin ülke risk primini gösteren 5 yıllık CDS oranı son 6 ayın en düşük seviyelerine gerileyerek uluslararası piyasalarda kredibilite artışına işaret ediyor. Bu durum yabancı kurumların Türk tahvillerine ve hisse senedi piyasasına olan ilgisini canlı tutmaya devam etmektedir."
+      },
+      {
+        title: "TCMB Parasal Sıkılaşma ve Likidite Adımlarını Sürdürüyor",
+        detail: "Türkiye Cumhuriyet Merkez Bankası (TCMB), enflasyon patikasındaki hedef doğrultusunda likidite çekme adımlarını ve mevduat faizlerindeki efektif sıkılığı koruyor. Piyasalarda dezenflasyon sürecinin 2. yarıyıldaki seyri ve reel sektör kredileri üzerindeki etkileri yakından izlenmektedir."
+      }
     ],
-    bist_section: {
-      opening_outlook: "BIST 100 endeksinin güne hafif alıcılı yatay bir seyirle başlaması bekleniyor. 14.500 direnç, 14.250 seviyesi ise ana destek konumunda.",
-      highlights: [
-        "İşlem Hacmi Liderleri: THYAO, AKBNK ve ISCTR yüksek işlem hacimleriyle BIST 100 hareketliliğinde başı çekmeye devam ediyor.",
-        "CDS & Risk Primi: Türkiye 5 yıllık CDS primlerinin son 6 ayın dip seviyelerine inmesi yabancı yatırımcı ilgisini destekliyor (MKK yatırımcı sayısı: 4,57 milyon).",
-        "KAP Haberleri: ICU Girişim YK üyesi değişikliği, şirketlerin pay geri alım programları ve 2. çeyrek sürdürülebilirlik bildirimleri takip ediliyor."
-      ]
-    },
-    us_market_section: {
-      futures_outlook: "ABD vadeli endeksleri seans öncesinde PCE enflasyon verisi sonrası temkinli-yatay seyrediyor. Nasdaq vadeleri Nvidia bilançosu öncesi dalgalı.",
-      highlights: [
-        "Jackson Hole Sempozyumu (27-29 Ağustos): Fed Başkanı Kevin Warsh'un Cuma günü yapacağı açılış konuşması faiz patikasına ışık tutacak.",
-        "Big Tech & Yapay Zeka: Nvidia çeyreklik finansal sonuçları veri merkezi gelirleri ve AI sektör ivmesi açısından kritik barometre olarak izleniyor.",
-        "PCE Enflasyonu: Aylık çekirdek artış %0,2 ile beklentilere paralel gelse de yıllık %3,3 seviyesindeki katılık tahvil getirilerini hareketlendiriyor."
-      ]
-    },
-    macro_section: {
-      global_view: "ABD 10 Yıllık Tahvil Faizleri %4,65 seviyesinde dengelenmiş durumdayken, küresel kıymetli madenler ve döviz piyasalarında pozitif seyir izleniyor.",
-      commodities_fx: "Dolar/TL 48,12 TL, Euro/TL 56,10 TL seviyesinde; Ons Altın $4.620, Gram Altın 7.140 TL; Ons Gümüş $68,00, Gram Gümüş 105,07 TL ve Brent Petrol varil başına $85,50 seviyesinde işlem görmektedir."
-    },
-    economic_calendar: [
-      "15:30 - ABD Çekirdek PCE Enflasyon Verisi (Aylık %0,2 / Yıllık %3,3)",
-      "17:30 - ABD Haftalık Ham Petrol Stok Değişimi",
-      "21:00 - Jackson Hole Ekonomik Sempozyumu Resmi Açılışı"
+    bist_impact_analysis: [
+      {
+        topic: "CDS Primindeki Gerileme ve Yabancı Girişleri",
+        analysis: "Risk primindeki gerileme BIST Bankacılık Endeksi (XBANK) ve yüksek piyasa değerine sahip BIST 30 hisselerine doğrudan pozitif katkı sunmaktadır. Yabancı takas oranındaki kademeli artışın seans içi tepki alımlarını desteklemesi beklenmektedir."
+      },
+      {
+        topic: "Küresel Petrol Fiyatlarındaki Gerilemenin Ulaştırma Sektörüne Etkisi",
+        analysis: "Brent petrol fiyatlarının 85,50 dolara gerilemesi, akaryakıt maliyet baskısını azaltarak Türk Hava Yolları (THYAO) ve Pegasus (PGSUS) gibi ulaştırma hisselerinde marj genişlemesini destekleyici bir unsur olarak değerlendirilmektedir."
+      }
+    ],
+    company_news: [
+      {
+        ticker: "THYAO",
+        title: "Türk Hava Yolları Yolcu Sayısı ve Doluluk Oranlarını Açıklandı",
+        detail: "THY, yolcu doluluk oranlarında güçlü performansını korurken, düşen jet yakıtı fiyatları çeyreklik marjlar üzerinde olumlu katkı yapmaya devam ediyor."
+      },
+      {
+        ticker: "AKBNK",
+        title: "Akbank Yabancı Yatırımcı Hacimlerinde Liderliğini Sürdürüyor",
+        detail: "Bankacılık sektöründeki güçlü sermaye yeterlilik rasyoları ve takipteki kredi oranlarındaki kontrollü seyir ile BIST 30 yükselişine öncülük ediyor."
+      },
+      {
+        ticker: "ICU",
+        title: "ICU Girişim Sermayesi KAP Bildirimi",
+        detail: "Şirket Yönetim Kurulu üyesi değişikliği ve sürdürülebilirlik raporlama bildirimlerini KAP platformu üzerinden kamuoyuna duyurdu."
+      }
+    ],
+    global_news: [
+      {
+        title: "ABD Temmuz PCE Enflasyonu Yıllık %3,3 Olarak Açıklandı",
+        detail: "Fed'in en çok dikkate aldığı Çekirdek PCE enflasyonu yıllık %3,3 ile beklentilere paralel gerçekleşti. Bu durum Fed'in faiz indirim döngüsüne dair zamanlama tartışmalarını diri tutuyor."
+      },
+      {
+        title: "Fed Jackson Hole Ekonomik Sempozyumu Başlıyor",
+        detail: "Küresel merkez bankacıların buluştuğu Jackson Hole toplantılarında Fed Başkanı Kevin Warsh'un Cuma günü yapacağı açılış konuşması öncesinde küresel piyasalarda temkinli duruş hakim."
+      },
+      {
+        title: "Nvidia Çeyreklik Bilanço Açıklaması Öncesinde Yapay Zeka Hisseleri İzleniyor",
+        detail: "Dünyanın en büyük çip üreticilerinden Nvidia'nın açıklayacağı çeyreklik gelir rakamları ve veri merkezi satış beklentileri küresel Big Tech hisselerinin yönü açısından kritik önem taşıyor."
+      }
     ]
   };
 }
@@ -198,28 +215,54 @@ function renderHtml(bulletin, indicators) {
   const templatePath = path.join(__dirname, 'notifier', 'templates', 'bulletin.html');
   let html = fs.readFileSync(templatePath, 'utf8');
 
-  // Simple template renderer for values
-  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title);
-  html = html.replace(/\{\{\s*bulletin\.bist_section\.opening_outlook\s*\}\}/g, bulletin.bist_section.opening_outlook);
-  html = html.replace(/\{\{\s*bulletin\.us_market_section\.futures_outlook\s*\}\}/g, bulletin.us_market_section.futures_outlook);
-  html = html.replace(/\{\{\s*bulletin\.macro_section\.global_view\s*\}\}/g, bulletin.macro_section.global_view);
-  html = html.replace(/\{\{\s*bulletin\.macro_section\.commodities_fx\s*\}\}/g, bulletin.macro_section.commodities_fx);
+  // Title & year
+  html = html.replace(/\{\{\s*bulletin\.title\s*\}\}/g, bulletin.title || 'Sabah Finans Bülteni');
   html = html.replace(/\{\{\s*now_year\s*\}\}/g, new Date().getFullYear());
 
-  // Render lists
-  const execHtml = bulletin.executive_summary.map(i => `<li><strong>${i}</strong></li>`).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.executive_summary\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, execHtml);
+  // Render Section 1: turkey_news
+  const turkeyHtml = (bulletin.turkey_news || []).map(i => `
+    <div class="news-item">
+      <div class="news-item-title">📌 ${i.title}</div>
+      <div class="news-item-detail">${i.detail}</div>
+    </div>
+  `).join('\n');
+  html = html.replace(/\{%\s*for item in bulletin\.turkey_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, turkeyHtml);
 
-  const bistHtml = bulletin.bist_section.highlights.map(i => `<li><span class="badge-bist">BIST</span>${i}</li>`).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.bist_section\.highlights\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, bistHtml);
+  // Render Section 2: bist_impact_analysis
+  const impactHtml = (bulletin.bist_impact_analysis || []).map(i => `
+    <div class="impact-box">
+      <div class="impact-title">⚡ ${i.topic}</div>
+      <div class="impact-text"><strong>Olası Borsa Etkisi:</strong> ${i.analysis}</div>
+    </div>
+  `).join('\n');
+  html = html.replace(/\{%\s*for item in bulletin\.bist_impact_analysis\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, impactHtml);
 
-  const usHtml = bulletin.us_market_section.highlights.map(i => `<li><span class="badge-us">US MARKET</span>${i}</li>`).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.us_market_section\.highlights\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, usHtml);
+  // Render Section 3: company_news
+  const companyHtml = (bulletin.company_news || []).map(i => `
+    <div class="news-item">
+      <div class="news-item-title">
+        ${i.ticker ? `<span class="company-badge">${i.ticker}</span>` : ''}${i.title}
+      </div>
+      <div class="news-item-detail">${i.detail}</div>
+    </div>
+  `).join('\n');
+  html = html.replace(/\{%\s*for item in bulletin\.company_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, companyHtml);
 
-  const calHtml = bulletin.economic_calendar.map(i => `<div class="calendar-item">📌 ${i}</div>`).join('\n');
-  html = html.replace(/\{%\s*for item in bulletin\.economic_calendar\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, calHtml);
+  // Render Section 4: global_news
+  const globalHtml = (bulletin.global_news || []).map(i => `
+    <div class="news-item">
+      <div class="news-item-title">🌐 ${i.title}</div>
+      <div class="news-item-detail">${i.detail}</div>
+    </div>
+  `).join('\n');
+  html = html.replace(/\{%\s*for item in bulletin\.global_news\s*%\}([\s\S]*?)\{%\s*endfor\s*%\}/g, globalHtml);
 
-  const indHtml = indicators.map(ind => `<div class="indicator-item"><strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})</div>`).join('\n');
+  // Render indicators bar
+  const indHtml = (indicators || []).map(ind => `
+    <div class="indicator-item">
+      <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
+    </div>
+  `).join('\n');
   html = html.replace(/\{%\s*if indicators\s*%\}([\s\S]*?)\{%\s*endif\s*%\}/g, `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
@@ -231,7 +274,6 @@ async function sendMail(bulletin, htmlContent) {
   const recipient = process.env.RECIPIENT_EMAIL || user;
   const resendApiKey = process.env.RESEND_API_KEY;
 
-  // Option 1: Try Resend API if API Key is configured
   if (resendApiKey && !resendApiKey.includes('your_resend')) {
     try {
       console.log(`[Resend API] Sending email to ${recipient}...`);
@@ -250,7 +292,6 @@ async function sendMail(bulletin, htmlContent) {
     }
   }
 
-  // Option 2: Try SMTP
   if (!user || !pass) {
     console.log('[SMTP Warning] Credentials not set in .env. Saving HTML preview.');
     fs.writeFileSync('bulletin_preview.html', htmlContent, 'utf8');
@@ -306,7 +347,7 @@ async function main() {
 
   console.log(`Fetched: ${bistNews.length} BIST items, ${usNews.length} US items, ${macroNews.length} Macro items.`);
 
-  console.log('Step 2/4: Generating AI Financial Bulletin with Gemini...');
+  console.log('Step 2/4: Generating Custom 4-Section AI Bulletin with Gemini...');
   const bulletin = await generateBulletinWithGemini(bistNews, usNews, macroNews, indicators);
 
   console.log('Step 3/4: Rendering Executive HTML Email Template...');
@@ -318,9 +359,9 @@ async function main() {
     return;
   }
 
-  console.log('Step 4/4: Delivering Email via Gmail SMTP...');
+  console.log('Step 4/4: Delivering Email via Resend / SMTP...');
   await sendMail(bulletin, htmlContent);
-  console.log('🎉 Bulletin Pipeline Completed!');
+  console.log('🎉 Custom Bulletin Pipeline Completed!');
 }
 
 main().catch(err => {
