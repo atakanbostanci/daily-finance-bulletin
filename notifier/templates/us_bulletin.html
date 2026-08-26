@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>{{ BULLETIN_TITLE }}</title>
   <style>
     body {
@@ -14,40 +16,11 @@
     }
     .container {
       max-width: 720px;
-      margin: 20px auto;
+      margin: 10px auto;
       background-color: #ffffff;
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    }
-    .header {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-      color: #ffffff;
-      padding: 30px 24px;
-      border-bottom: 4px solid #10b981;
-    }
-    .header-tag {
-      display: inline-block;
-      background-color: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-      color: #ffffff;
-    }
-    .header p {
-      margin: 6px 0 0 0;
-      font-size: 13px;
-      color: #c7d2fe;
     }
     .indicator-bar {
       background-color: #1e293b;
@@ -67,33 +40,33 @@
       color: #38bdf8;
     }
     .content {
-      padding: 26px;
+      padding: 20px;
     }
     .card {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 22px;
-      margin-bottom: 24px;
+      padding: 18px;
+      margin-bottom: 20px;
     }
     .card-title {
-      font-size: 16.5px;
+      font-size: 16px;
       font-weight: 800;
       color: #0f172a;
       margin-top: 0;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       border-bottom: 2px solid #f1f5f9;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
     }
     .card-title span {
-      margin-right: 10px;
-      font-size: 20px;
+      margin-right: 8px;
+      font-size: 18px;
     }
     .news-item {
-      margin-bottom: 16px;
-      padding-bottom: 14px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
       border-bottom: 1px dashed #e2e8f0;
     }
     .news-item:last-child {
@@ -102,35 +75,35 @@
       padding-bottom: 0;
     }
     .news-item-title {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       color: #1e293b;
       margin-bottom: 4px;
       line-height: 1.4;
     }
     .news-item-detail {
-      font-size: 13.5px;
+      font-size: 13px;
       color: #475569;
-      line-height: 1.55;
+      line-height: 1.5;
     }
     .impact-box {
       background-color: #f0fdf4;
       border-left: 4px solid #10b981;
       border-radius: 6px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
     }
     .impact-box:last-child {
       margin-bottom: 0;
     }
     .impact-title {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #047857;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .impact-text {
-      font-size: 13.5px;
+      font-size: 13px;
       color: #065f46;
       line-height: 1.5;
     }
@@ -139,8 +112,8 @@
       border: 1px solid #cbd5e1;
       border-left: 5px solid #4f46e5;
       border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 18px;
+      padding: 14px;
+      margin-bottom: 16px;
     }
     .stock-box:last-child {
       margin-bottom: 0;
@@ -148,33 +121,33 @@
     .stock-header {
       display: flex;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .stock-badge {
       background-color: #312e81;
       color: #ffffff;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
-      padding: 3px 9px;
-      border-radius: 5px;
-      margin-right: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
     }
     .stock-title {
-      font-size: 14.5px;
+      font-size: 14px;
       font-weight: 700;
       color: #0f172a;
     }
     .stock-detail {
-      font-size: 13.5px;
+      font-size: 13px;
       color: #334155;
-      line-height: 1.55;
-      margin-bottom: 10px;
+      line-height: 1.5;
+      margin-bottom: 8px;
     }
     .forecast-box {
       background-color: #eff6ff;
       border-radius: 6px;
-      padding: 10px 14px;
-      font-size: 13px;
+      padding: 10px 12px;
+      font-size: 12.5px;
       color: #1e40af;
       line-height: 1.5;
     }
@@ -190,7 +163,7 @@
     }
     .footer {
       background-color: #f8fafc;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
       font-size: 12px;
       color: #94a3b8;
@@ -198,14 +171,21 @@
     }
   </style>
 </head>
-<body>
+<body style="margin:0; padding:0; background-color:#0f172a;">
 
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-tag">Amerika Finans Bülteni (16:00)</div>
-      <h1>{{ BULLETIN_TITLE }}</h1>
-      <p>S&P 500 | NASDAQ | Dow Jones | Pre-Market Movers | Özel Takip Listesi</p>
+  <div class="container" style="max-width:720px; margin:10px auto; background-color:#ffffff; border-radius:12px; overflow:hidden;">
+    
+    <!-- Mobil Uyumlu Yüksek Kontrastlı Header -->
+    <div style="background-color:#1e1b4b; padding:24px 20px; border-bottom:4px solid #10b981; text-align:left;">
+      <div style="display:inline-block; background-color:#10b981; color:#064e3b !important; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:4px 10px; border-radius:4px; margin-bottom:10px;">
+        Amerika Finans Bülteni (16:00)
+      </div>
+      <h1 style="margin:0; font-size:22px; font-weight:800; color:#ffffff !important; line-height:1.3; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        {{ BULLETIN_TITLE }}
+      </h1>
+      <p style="margin:8px 0 0 0; font-size:13px; color:#c7d2fe !important; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        S&P 500 | NASDAQ | Dow Jones | Pre-Market Movers | Özel Takip Listesi
+      </p>
     </div>
 
     <!-- Live Indicators Bar -->
@@ -247,8 +227,8 @@
 
     <!-- Footer -->
     <div class="footer">
-      <p>Bu bülten her gün saat 16:00 itibarıyla Wall Street açılışı öncesinde Kurumsal Finans Uzmanları için özel Yapay Zeka otomasyonu ile derlenip gönderilmektedir.</p>
-      <p>© {{ NOW_YEAR }} Daily Finance Bulletin | Tüm hakları saklıdır.</p>
+      <p style="margin:0 0 4px 0; color:#94a3b8 !important;">Bu bülten her gün saat 16:00 itibarıyla Wall Street açılışı öncesinde Kurumsal Finans Uzmanları için özel Yapay Zeka otomasyonu ile derlenip gönderilmektedir.</p>
+      <p style="margin:0; color:#94a3b8 !important;">© {{ NOW_YEAR }} Daily Finance Bulletin | Tüm hakları saklıdır.</p>
     </div>
   </div>
 
