@@ -15,6 +15,7 @@
     "dotenv": "^17.4.2",
     "nodemailer": "^9.0.5",
     "resend": "^6.24.0",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "tweetsodium": "^0.0.4"
   }
 }
