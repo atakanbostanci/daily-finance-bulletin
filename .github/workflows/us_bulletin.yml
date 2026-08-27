@@ -1,0 +1,30 @@
+name: Afternoon US Wall Street Bulletin (16:00 TR)
+
+on:
+  schedule:
+    # 13:00 UTC corresponds to 16:00 PM Turkey Time (UTC+3)
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-us-bulletin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run US Wall Street Bulletin Engine (16:00 TR Time)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: node us_index.js
