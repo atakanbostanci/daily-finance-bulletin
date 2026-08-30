@@ -29,7 +29,7 @@ const WATCHLIST_TICKERS = ['ORCL', 'TSLA', 'SPCX', 'SMCI', 'MSFT', 'AMZN', 'ADBE
 
 function cleanText(text) {
   if (!text) return '';
-  return text.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+  return text.replace(/<[^>]*>?/gm, '').replace(/s+/g, ' ').trim();
 }
 
 async function fetchFeed(sources, maxPerFeed = 10) {
@@ -60,7 +60,7 @@ async function fetchWatchlistNews() {
   WATCHLIST_TICKERS.forEach(t => stockNews[t] = null);
   
   try {
-    const url = \`https://feeds.finance.yahoo.com/rss/2.0/headline?s=\${WATCHLIST_TICKERS.join(',')}\`;
+    const url = `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${WATCHLIST_TICKERS.join(',')}`;
     const feed = await parser.parseURL(url);
     for (const entry of feed.items) {
       for (const ticker of WATCHLIST_TICKERS) {
@@ -76,8 +76,8 @@ async function fetchWatchlistNews() {
     for (const ticker of WATCHLIST_TICKERS) {
       if (!stockNews[ticker]) {
         stockNews[ticker] = {
-          title: \`\${ticker} Piyasa Öncesi Aktif İşlemler ve Hacim Beklentisi\`,
-          summary: \`\${ticker} hissesinde Wall Street açılışı öncesi kurumsal algoritmik işlemler ve opsiyon fiyatlamaları takip edilmektedir.\`
+          title: `${ticker} Piyasa Öncesi Aktif İşlemler ve Hacim Beklentisi`,
+          summary: `${ticker} hissesinde Wall Street açılışı öncesi kurumsal algoritmik işlemler ve opsiyon fiyatlamaları takip edilmektedir.`
         };
       }
     }
@@ -85,8 +85,8 @@ async function fetchWatchlistNews() {
     console.warn('[RSS Warning] Watchlist news fetch failed:', err.message);
     WATCHLIST_TICKERS.forEach(ticker => {
        stockNews[ticker] = {
-         title: \`\${ticker} Seans Açılışı Beklentileri\`,
-         summary: \`\${ticker} hisse senedi açılış öncesi işlemlerde genel piyasa trendine paralel izlenmektedir.\`
+         title: `${ticker} Seans Açılışı Beklentileri`,
+         summary: `${ticker} hisse senedi açılış öncesi işlemlerde genel piyasa trendine paralel izlenmektedir.`
        };
     });
   }
@@ -132,14 +132,14 @@ async function fetchMarketIndicators() {
   ]);
 
   const indicators = [
-    { name: 'S&P 500 Fut', price: \`\${spFut ? spFut.price.toFixed(2) : 'N/A'}\`, change_pct: spFut ? spFut.changePct : '0.00%' },
-    { name: 'Nasdaq Fut', price: \`\${nasdaqFut ? nasdaqFut.price.toFixed(2) : 'N/A'}\`, change_pct: nasdaqFut ? nasdaqFut.changePct : '0.00%' },
-    { name: 'Dow Jones Fut', price: \`\${dowFut ? dowFut.price.toFixed(2) : 'N/A'}\`, change_pct: dowFut ? dowFut.changePct : '0.00%' },
-    { name: 'Ons Altın ($)', price: \`\${gold ? gold.price.toFixed(2) : 'N/A'} $\`, change_pct: gold ? gold.changePct : '0.00%' },
-    { name: 'Ons Gümüş ($)', price: \`\${silver ? silver.price.toFixed(2) : 'N/A'} $\`, change_pct: silver ? silver.changePct : '0.00%' },
-    { name: 'Brent Petrol ($)', price: \`\${brent ? brent.price.toFixed(2) : 'N/A'} $\`, change_pct: brent ? brent.changePct : '0.00%' },
-    { name: 'ABD 10Y Tahvil (%)', price: \`\${us10y ? us10y.price.toFixed(2) : 'N/A'}%\`, change_pct: us10y ? us10y.changePct : '0.00%' },
-    { name: 'VIX Korku Endeksi', price: \`\${vix ? vix.price.toFixed(2) : 'N/A'}\`, change_pct: vix ? vix.changePct : '0.00%' }
+    { name: 'S&P 500 Fut', price: `${spFut ? spFut.price.toFixed(2) : 'N/A'}`, change_pct: spFut ? spFut.changePct : '0.00%' },
+    { name: 'Nasdaq Fut', price: `${nasdaqFut ? nasdaqFut.price.toFixed(2) : 'N/A'}`, change_pct: nasdaqFut ? nasdaqFut.changePct : '0.00%' },
+    { name: 'Dow Jones Fut', price: `${dowFut ? dowFut.price.toFixed(2) : 'N/A'}`, change_pct: dowFut ? dowFut.changePct : '0.00%' },
+    { name: 'Ons Altın ($)', price: `${gold ? gold.price.toFixed(2) : 'N/A'} $`, change_pct: gold ? gold.changePct : '0.00%' },
+    { name: 'Ons Gümüş ($)', price: `${silver ? silver.price.toFixed(2) : 'N/A'} $`, change_pct: silver ? silver.changePct : '0.00%' },
+    { name: 'Brent Petrol ($)', price: `${brent ? brent.price.toFixed(2) : 'N/A'} $`, change_pct: brent ? brent.changePct : '0.00%' },
+    { name: 'ABD 10Y Tahvil (%)', price: `${us10y ? us10y.price.toFixed(2) : 'N/A'}%`, change_pct: us10y ? us10y.changePct : '0.00%' },
+    { name: 'VIX Korku Endeksi', price: `${vix ? vix.price.toFixed(2) : 'N/A'}`, change_pct: vix ? vix.changePct : '0.00%' }
   ];
 
   return indicators;
@@ -149,15 +149,15 @@ async function generateUSBulletinWithGemini(usNews, macroNews, watchNews, indica
   const apiKey = process.env.GEMINI_API_KEY;
   const todayStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  let contextText = \`=== BUGÜNÜN TARİHİ: \${todayStr} ===\n\n\`;
-  contextText += \`=== ABD PİYASALARI HABERLERİ ===\n\` + usNews.map(i => \`- [\${i.source}] \${i.title}: \${i.summary}\`).join('\n') + '\n\n';
-  contextText += \`=== KÜRESEL MAKROEKONOMİ HABERLERİ ===\n\` + macroNews.map(i => \`- [\${i.source}] \${i.title}: \${i.summary}\`).join('\n') + '\n\n';
-  contextText += \`=== İZLEME LİSTESİ HİSSE HABERLERİ (ÇOK ÖNEMLİ) ===\n\`;
+  let contextText = `=== BUGÜNÜN TARİHİ: ${todayStr} ===nn`;
+  contextText += `=== ABD PİYASALARI HABERLERİ ===n` + usNews.map(i => `- [${i.source}] ${i.title}: ${i.summary}`).join('n') + 'nn';
+  contextText += `=== KÜRESEL MAKROEKONOMİ HABERLERİ ===n` + macroNews.map(i => `- [${i.source}] ${i.title}: ${i.summary}`).join('n') + 'nn';
+  contextText += `=== İZLEME LİSTESİ HİSSE HABERLERİ (ÇOK ÖNEMLİ) ===n`;
   for (const ticker of WATCHLIST_TICKERS) {
-    contextText += \`- [\${ticker}] \${watchNews[ticker].title}: \${watchNews[ticker].summary}\n\`;
+    contextText += `- [${ticker}] ${watchNews[ticker].title}: ${watchNews[ticker].summary}n`;
   }
 
-  const systemPrompt = \`
+  const systemPrompt = `
 Sen Wall Street'te görev yapan üst düzey bir Kurumsal Finans Uzmanı ve ABD Piyasaları Stratejistisin. 
 Sana sağlanan güncel haberleri ve verileri inceleyerek, Wall Street zilinin çalmasına (16:30 TSİ) 30 dakika kala, her gün saat 16:00'da Kurumsal Finans Uzmanının okuyacağı VIP ABD Piyasaları Açılış Öncesi Bülteni hazırlayacaksın.
 
@@ -172,7 +172,7 @@ KRİTİK UZMANLIK TALİMATLARI:
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 {
-  "title": "🇺🇸 Amerika Finans Bülteni - \${todayStr}",
+  "title": "🇺🇸 Amerika Finans Bülteni - ${todayStr}",
   "us_macro_news": [
     {"title": "1. En Önemli ABD Siyasi/Makroekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
     {"title": "2. ABD Makro/Fed Gelişme Başlığı", "detail": "Detaylı açıklama..."},
@@ -211,7 +211,7 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
     ... (Diğer 7 hisse: TSLA, SPCX, SMCI, MSFT, AMZN, ADBE, AAPL için SANA VERİLEN CANLI HABERLERİ KULLANARAK AYNI FORMATTA) ...
   ]
 }
-\`;
+`;
 
   if (apiKey && !apiKey.includes('your_gemini_api_key')) {
     try {
@@ -222,7 +222,7 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
       for (const mName of modelNames) {
         try {
           const model = genAI.getGenerativeModel({ model: mName });
-          const result = await model.generateContent(\`\${systemPrompt}\n\nVERİLER:\n\${contextText}\`);
+          const result = await model.generateContent(`${systemPrompt}nnVERİLER:n${contextText}`);
           text = result.response.text().trim();
           if (text) break;
         } catch (e) {
@@ -231,13 +231,13 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
       }
 
       if (text) {
-        if (text.startsWith('\`\`\`')) {
-          text = text.replace(/^\`\`\`json/, '').replace(/^\`\`\`/, '').replace(/\`\`\`$/, '').trim();
+        if (text.startsWith('```')) {
+          text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
         }
         return JSON.parse(text);
       }
     } catch (err) {
-      console.warn(\`[Gemini Warn] \${err.message}. Using Live US RSS Synthesizer.\`);
+      console.warn(`[Gemini Warn] ${err.message}. Using Live US RSS Synthesizer.`);
     }
   }
 
@@ -247,39 +247,39 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 function generateLiveUSRSSBulletin(usNews, macroNews, watchNews, todayStr) {
   const usMacroItems = macroNews.slice(0, 5).map((item, idx) => ({
-    title: \`\${idx + 1}. \${item.title}\`,
-    detail: \`\${item.summary} [Kaynak: \${item.source} - \${todayStr}]\`
+    title: `${idx + 1}. ${item.title}`,
+    detail: `${item.summary} [Kaynak: ${item.source} - ${todayStr}]`
   }));
 
   const usImpactItems = usNews.slice(0, 5).map((item, idx) => ({
-    topic: \`\${idx + 1}. \${item.title}\`,
-    analysis: \`S&P 500, Nasdaq 100 ve Wall Street açılış öncesi işlemlere olası etkisi: \${item.summary}\`
+    topic: `${idx + 1}. ${item.title}`,
+    analysis: `S&P 500, Nasdaq 100 ve Wall Street açılış öncesi işlemlere olası etkisi: ${item.summary}`
   }));
 
   const usCompanyItems = usNews.slice(5, 10).map((item, idx) => ({
     ticker: 'US',
-    title: \`\${idx + 1}. \${item.title}\`,
-    detail: \`\${item.summary} Wall Street analist tahminleri ve pre-market hareketleri izlenmektedir.\`
+    title: `${idx + 1}. ${item.title}`,
+    detail: `${item.summary} Wall Street analist tahminleri ve pre-market hareketleri izlenmektedir.`
   }));
 
   const usGlobalItems = macroNews.length >= 10 ? macroNews.slice(5, 10) : usNews.slice(10, 15);
   const formattedGlobal = usGlobalItems.map((item, idx) => ({
-    title: \`\${idx + 1}. \${item.title}\`,
-    detail: \`\${item.summary} [Kaynak: \${item.source} - Küresel Piyasalar]\`
+    title: `${idx + 1}. ${item.title}`,
+    detail: `${item.summary} [Kaynak: ${item.source} - Küresel Piyasalar]`
   }));
 
   const watchlist = WATCHLIST_TICKERS.map((ticker) => {
     const liveNews = watchNews[ticker];
     return {
       ticker: ticker,
-      title: \`\${ticker}: \${liveNews.title}\`,
-      detail: \`\${liveNews.summary} [Canlı Veri]\`,
-      forecast: \`Volatilite Beklentisi: Güncel piyasa haberleri ve kurumsal gelişmeler doğrultusunda seans içerisinde hareketlilik öngörülmektedir.\`
+      title: `${ticker}: ${liveNews.title}`,
+      detail: `${liveNews.summary} [Canlı Veri]`,
+      forecast: `Volatilite Beklentisi: Güncel piyasa haberleri ve kurumsal gelişmeler doğrultusunda seans içerisinde hareketlilik öngörülmektedir.`
     };
   });
 
   return {
-    title: \`🇺🇸 Amerika Finans Bülteni - \${todayStr}\`,
+    title: `🇺🇸 Amerika Finans Bülteni - ${todayStr}`,
     us_macro_news: usMacroItems.length === 5 ? usMacroItems : getFallbackUSMacroNews(todayStr),
     us_market_impact: usImpactItems.length === 5 ? usImpactItems : getFallbackUSImpact(todayStr),
     us_company_news: usCompanyItems.length === 5 ? usCompanyItems : getFallbackUSCompanyNews(todayStr),
@@ -290,11 +290,11 @@ function generateLiveUSRSSBulletin(usNews, macroNews, watchNews, todayStr) {
 
 function getFallbackUSMacroNews(todayStr) {
   return [
-    { title: "1. ABD Enflasyon Verileri ve Fed Faiz Patikası Beklentileri", detail: \`ABD Ticaret Bakanlığı verileri ve Fed'in faiz indirim sürecine ilişkin sinyaller Wall Street endekslerini şekillendiriyor. [Tarih: \${todayStr}]\` },
-    { title: "2. Fed Başkanı Açıklamaları ve Bilanço Küçültme (QT) Takvimi", detail: \`Fed yetkililerinin konuşmaları, tahvil getirileri ve nötr faiz seviyelerine ilişkin mesajlar takip ediliyor.\` },
-    { title: "3. ABD Hazine Tahvil İhaleleri ve Getiri Eğrisi Görünümü", detail: \`10 yıllık ABD tahvil faizlerindeki seyir teknoloji ve büyüme hisseleri üzerinde belirleyici olmaktadır.\` },
-    { title: "4. ABD Ticaret Politikası ve İhracat Denetim Kararları", detail: \`ABD Ticaret Bakanlığı kısıtlama ve lisanslama kriterleri çip ve teknoloji üreticilerini etkilemektedir.\` },
-    { title: "5. ABD İşgücü Piyasası ve Haftalık İşsizlik Başvuruları", detail: \`İşgücü piyasasındaki soğuma eğilimi enflasyonist risklerin gerilediğini teyit etmektedir.\` }
+    { title: "1. ABD Enflasyon Verileri ve Fed Faiz Patikası Beklentileri", detail: `ABD Ticaret Bakanlığı verileri ve Fed'in faiz indirim sürecine ilişkin sinyaller Wall Street endekslerini şekillendiriyor. [Tarih: ${todayStr}]` },
+    { title: "2. Fed Başkanı Açıklamaları ve Bilanço Küçültme (QT) Takvimi", detail: `Fed yetkililerinin konuşmaları, tahvil getirileri ve nötr faiz seviyelerine ilişkin mesajlar takip ediliyor.` },
+    { title: "3. ABD Hazine Tahvil İhaleleri ve Getiri Eğrisi Görünümü", detail: `10 yıllık ABD tahvil faizlerindeki seyir teknoloji ve büyüme hisseleri üzerinde belirleyici olmaktadır.` },
+    { title: "4. ABD Ticaret Politikası ve İhracat Denetim Kararları", detail: `ABD Ticaret Bakanlığı kısıtlama ve lisanslama kriterleri çip ve teknoloji üreticilerini etkilemektedir.` },
+    { title: "5. ABD İşgücü Piyasası ve Haftalık İşsizlik Başvuruları", detail: `İşgücü piyasasındaki soğuma eğilimi enflasyonist risklerin gerilediğini teyit etmektedir.` }
   ];
 }
 
@@ -335,73 +335,73 @@ function renderUSHtml(bulletin, indicators) {
   html = html.replaceAll('{{ BULLETIN_TITLE }}', () => bulletin.title || '🇺🇸 Amerika Finans Bülteni');
   html = html.replaceAll('{{ NOW_YEAR }}', () => new Date().getFullYear());
 
-  const macroHtml = (bulletin.us_macro_news || []).map(i => \`
+  const macroHtml = (bulletin.us_macro_news || []).map(i => `
     <div class="news-item">
-      <div class="news-item-title">📌 \${i.title}</div>
-      <div class="news-item-detail">\${i.detail}</div>
+      <div class="news-item-title">📌 ${i.title}</div>
+      <div class="news-item-detail">${i.detail}</div>
     </div>
-  \`).join('\n');
+  `).join('n');
   html = html.replaceAll('<!-- US_MACRO_NEWS_PLACEHOLDER -->', () => macroHtml);
 
-  const impactHtml = (bulletin.us_market_impact || []).map(i => \`
+  const impactHtml = (bulletin.us_market_impact || []).map(i => `
     <div class="impact-box">
-      <div class="impact-title">⚡ \${i.topic}</div>
-      <div class="impact-text"><strong>Olası Seans İçi Etki:</strong> \${i.analysis}</div>
+      <div class="impact-title">⚡ ${i.topic}</div>
+      <div class="impact-text"><strong>Olası Seans İçi Etki:</strong> ${i.analysis}</div>
     </div>
-  \`).join('\n');
+  `).join('n');
   html = html.replaceAll('<!-- US_MARKET_IMPACT_PLACEHOLDER -->', () => impactHtml);
 
-  const companyHtml = (bulletin.us_company_news || []).map(i => \`
+  const companyHtml = (bulletin.us_company_news || []).map(i => `
     <div class="news-item">
       <div class="news-item-title">
-        \${i.ticker ? \`<span class="company-badge">\${i.ticker}</span>\` : ''}\${i.title}
+        ${i.ticker ? `<span class="company-badge">${i.ticker}</span>` : ''}${i.title}
       </div>
-      <div class="news-item-detail">\${i.detail}</div>
+      <div class="news-item-detail">${i.detail}</div>
     </div>
-  \`).join('\n');
+  `).join('n');
   html = html.replaceAll('<!-- US_COMPANY_NEWS_PLACEHOLDER -->', () => companyHtml);
 
-  const globalHtml = (bulletin.us_global_news || []).map(i => \`
+  const globalHtml = (bulletin.us_global_news || []).map(i => `
     <div class="news-item">
-      <div class="news-item-title">🌐 \${i.title}</div>
-      <div class="news-item-detail">\${i.detail}</div>
+      <div class="news-item-title">🌐 ${i.title}</div>
+      <div class="news-item-detail">${i.detail}</div>
     </div>
-  \`).join('\n');
+  `).join('n');
   html = html.replaceAll('<!-- US_GLOBAL_NEWS_PLACEHOLDER -->', () => globalHtml);
 
-  const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => \`
+  const watchlistHtml = (bulletin.watchlist_stocks || []).map(stock => `
     <div class="stock-box">
       <div class="stock-header">
-        <span class="stock-badge">\${stock.ticker}</span>
-        <span class="stock-title">\${stock.title}</span>
+        <span class="stock-badge">${stock.ticker}</span>
+        <span class="stock-title">${stock.title}</span>
       </div>
-      <div class="stock-detail">\${stock.detail}</div>
+      <div class="stock-detail">${stock.detail}</div>
       <div class="forecast-box">
-        <strong>📈 Seans İçi Yön Öngörüsü & Etki Analizi:</strong> \${stock.forecast}
+        <strong>📈 Seans İçi Yön Öngörüsü & Etki Analizi:</strong> ${stock.forecast}
       </div>
     </div>
-  \`).join('\n');
+  `).join('n');
   html = html.replaceAll('<!-- WATCHLIST_STOCKS_PLACEHOLDER -->', () => watchlistHtml);
 
-  const indHtml = (indicators || []).map(ind => \`
+  const indHtml = (indicators || []).map(ind => `
     <div class="indicator-item">
-      <strong>\${ind.name}:</strong> <span class="indicator-val">\${ind.price}</span> (\${ind.change_pct})
+      <strong>${ind.name}:</strong> <span class="indicator-val">${ind.price}</span> (${ind.change_pct})
     </div>
-  \`).join('\n');
-  html = html.replaceAll('<!-- INDICATORS_PLACEHOLDER -->', () => \`<div class="indicator-bar">\${indHtml}</div>\`);
+  `).join('n');
+  html = html.replaceAll('<!-- INDICATORS_PLACEHOLDER -->', () => `<div class="indicator-bar">${indHtml}</div>`);
 
   return html;
 }
 
 async function sendMail(bulletin, htmlContent) {
   const user = process.env.GMAIL_USER || 'atakanbostanci_@hotmail.com';
-  const pass = (process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  const pass = (process.env.GMAIL_APP_PASSWORD || '').replace(/s+/g, '');
   const recipient = process.env.RECIPIENT_EMAIL || user;
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (resendApiKey && !resendApiKey.includes('your_resend')) {
     try {
-      console.log(\`[Resend API] Sending US Bulletin email to \${recipient}...\`);
+      console.log(`[Resend API] Sending US Bulletin email to ${recipient}...`);
       const { Resend } = require('resend');
       const resend = new Resend(resendApiKey);
       const response = await resend.emails.send({
@@ -412,13 +412,13 @@ async function sendMail(bulletin, htmlContent) {
       });
 
       if (response.error) {
-        console.warn(\`[Resend Error] \${response.error.message || JSON.stringify(response.error)}\`);
+        console.warn(`[Resend Error] ${response.error.message || JSON.stringify(response.error)}`);
       } else if (response.data && response.data.id) {
-        console.log(\`🎉 [Resend Success] US Bulletin sent via Resend API! ID: \${response.data.id}\`);
+        console.log(`🎉 [Resend Success] US Bulletin sent via Resend API! ID: ${response.data.id}`);
         return true;
       }
     } catch (err) {
-      console.warn(\`[Resend Exception] Resend API failed: \${err.message}\`);
+      console.warn(`[Resend Exception] Resend API failed: ${err.message}`);
     }
   }
 
@@ -436,7 +436,7 @@ async function sendMail(bulletin, htmlContent) {
 
   for (const cfg of configs) {
     try {
-      console.log(\`[SMTP] Attempting connection via \${cfg.name} for \${user}...\`);
+      console.log(`[SMTP] Attempting connection via ${cfg.name} for ${user}...`);
       const transporter = nodemailer.createTransport({
         host: cfg.host,
         port: cfg.port,
@@ -446,16 +446,16 @@ async function sendMail(bulletin, htmlContent) {
       });
 
       const info = await transporter.sendMail({
-        from: \`"Wall Street Bülteni Otomasyonu" <\${user}>\`,
+        from: `"Wall Street Bülteni Otomasyonu" <${user}>`,
         to: recipient,
         subject: bulletin.title,
         html: htmlContent
       });
 
-      console.log(\`🎉 [SMTP Success] US Bulletin sent successfully via \${cfg.name}! MessageID: \${info.messageId}\`);
+      console.log(`🎉 [SMTP Success] US Bulletin sent successfully via ${cfg.name}! MessageID: ${info.messageId}`);
       return true;
     } catch (err) {
-      console.warn(\`[SMTP Warning] \${cfg.name} failed: \${err.message}\`);
+      console.warn(`[SMTP Warning] ${cfg.name} failed: ${err.message}`);
     }
   }
 
@@ -475,7 +475,7 @@ async function main() {
     fetchMarketIndicators()
   ]);
 
-  console.log(\`Fetched: \${usNews.length} US items, \${macroNews.length} Macro items, and 8 Live Watchlist items.\`);
+  console.log(`Fetched: ${usNews.length} US items, ${macroNews.length} Macro items, and 8 Live Watchlist items.`);
 
   console.log('Step 2/4: Generating 5-Section US AI Bulletin with 8 Watchlist Stocks...');
   const bulletin = await generateUSBulletinWithGemini(usNews, macroNews, watchNews, indicators);
