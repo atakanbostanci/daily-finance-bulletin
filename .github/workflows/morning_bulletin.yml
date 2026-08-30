@@ -2,8 +2,10 @@ name: Morning Turkey Finance Bulletin (08:00 TR)
 
 on:
   schedule:
-    # 05:00 UTC corresponds to 08:00 AM Turkey Time (UTC+3)
+    # Primary: 05:00 UTC = 08:00 AM Turkey Time (UTC+3)
     - cron: '0 5 * * *'
+    # Backup Retry: 05:15 UTC = 08:15 AM Turkey Time
+    - cron: '15 5 * * *'
   workflow_dispatch:
 
 jobs:

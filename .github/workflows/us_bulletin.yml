@@ -2,8 +2,10 @@ name: Afternoon US Wall Street Bulletin (16:00 TR)
 
 on:
   schedule:
-    # 13:00 UTC corresponds to 16:00 PM Turkey Time (UTC+3)
+    # Primary: 13:00 UTC = 16:00 PM Turkey Time (UTC+3)
     - cron: '0 13 * * *'
+    # Backup Retry: 13:15 UTC = 16:15 PM Turkey Time
+    - cron: '15 13 * * *'
   workflow_dispatch:
 
 jobs:
