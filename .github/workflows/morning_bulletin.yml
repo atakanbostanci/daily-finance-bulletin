@@ -2,10 +2,10 @@ name: Morning Turkey Finance Bulletin (08:00 TR)
 
 on:
   schedule:
-    # Primary: 05:00 UTC = 08:00 AM Turkey Time (UTC+3)
+    # 05:00 UTC = 08:00 AM Turkey Time (UTC+3)
     - cron: '0 5 * * *'
-    # Backup Retry: 05:15 UTC = 08:15 AM Turkey Time
-    - cron: '15 5 * * *'
+  repository_dispatch:
+    types: [morning-bulletin]
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Morning Bulletin Engine (08:00 TR Time)
+      - name: Run Morning Bulletin Engine
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

@@ -2,10 +2,10 @@ name: Afternoon US Wall Street Bulletin (16:00 TR)
 
 on:
   schedule:
-    # Primary: 13:00 UTC = 16:00 PM Turkey Time (UTC+3)
+    # 13:00 UTC = 16:00 PM Turkey Time (UTC+3)
     - cron: '0 13 * * *'
-    # Backup Retry: 13:15 UTC = 16:15 PM Turkey Time
-    - cron: '15 13 * * *'
+  repository_dispatch:
+    types: [us-bulletin]
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run US Wall Street Bulletin Engine (16:00 TR Time)
+      - name: Run US Wall Street Bulletin Engine
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}

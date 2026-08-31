@@ -61,7 +61,8 @@ async function fetchFeed(sources, maxPerFeed = 10) {
   return items;
 }
 
-function getYahooQuote(symbol) {
+// --- Yahoo Finance v8 API ---
+function getYahooQuoteV8(symbol) {
   return new Promise((resolve) => {
     const url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(symbol) + '?interval=1m&range=1d';
     const options = {
@@ -86,8 +87,45 @@ function getYahooQuote(symbol) {
   });
 }
 
+// --- Yahoo Finance v10 API (fallback) ---
+function getYahooQuoteV10(symbol) {
+  return new Promise((resolve) => {
+    const url = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary/' + encodeURIComponent(symbol) + '?modules=price';
+    const options = {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+    };
+    https.get(url, options, res => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const priceData = json.quoteSummary.result[0].price;
+          const price = priceData.regularMarketPrice.raw;
+          const prevClose = priceData.regularMarketPreviousClose.raw;
+          const changePct = ((price - prevClose) / prevClose * 100).toFixed(2);
+          resolve({ price, changePct: (changePct >= 0 ? '+' : '') + changePct + '%' });
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }).on('error', () => resolve(null));
+  });
+}
+
+// --- Combined quote fetcher: v8 first, then v10, then null ---
+async function getYahooQuote(symbol) {
+  const v8Result = await getYahooQuoteV8(symbol);
+  if (v8Result) return v8Result;
+  console.warn(`[Yahoo v8] ${symbol} failed, trying v10 fallback...`);
+  const v10Result = await getYahooQuoteV10(symbol);
+  if (v10Result) return v10Result;
+  console.warn(`[Yahoo v10] ${symbol} also failed. No data available.`);
+  return null;
+}
+
 async function fetchMarketIndicators() {
-  console.log('[Market Data] Fetching 100% real-time financial market indicators from Yahoo Finance...');
+  console.log('[Market Data] Fetching real-time financial market indicators from Yahoo Finance...');
   const [usdTry, eurTry, gold, silver, brent, us10y] = await Promise.all([
     getYahooQuote('USDTRY=X'),
     getYahooQuote('EURTRY=X'),
@@ -97,26 +135,29 @@ async function fetchMarketIndicators() {
     getYahooQuote('^TNX')
   ]);
 
-  const usdVal = usdTry ? usdTry.price : 48.24;
-  const eurVal = eurTry ? eurTry.price : 55.91;
-  const goldVal = gold ? gold.price : 4530.00;
-  const silverVal = silver ? silver.price : 67.80;
-  const brentVal = brent ? brent.price : 88.10;
-  const us10yVal = us10y ? us10y.price : 4.72;
+  // Helper: format price or 'Veri Yok'
+  const fmt = (quote, decimals = 2) => quote ? quote.price.toFixed(decimals) : null;
 
-  // Calculate Gram Gold and Gram Silver from live USD/TRY and Ons Gold / Ons Silver
-  const gramGoldVal = (goldVal / 31.1035 * usdVal).toFixed(2);
-  const gramSilverVal = (silverVal / 31.1035 * usdVal).toFixed(2);
+  const usdVal = fmt(usdTry);
+  const eurVal = fmt(eurTry);
+  const goldVal = fmt(gold);
+  const silverVal = fmt(silver);
+  const brentVal = fmt(brent);
+  const us10yVal = fmt(us10y);
+
+  // Calculate Gram Gold and Gram Silver only if both dependencies are available
+  const gramGoldVal = (usdTry && gold) ? (gold.price / 31.1035 * usdTry.price).toFixed(2) : null;
+  const gramSilverVal = (usdTry && silver) ? (silver.price / 31.1035 * usdTry.price).toFixed(2) : null;
 
   const indicators = [
-    { name: 'USD/TRY', price: `${usdVal.toFixed(2)} TL`, change_pct: usdTry ? usdTry.changePct : '+0.25%' },
-    { name: 'EUR/TRY', price: `${eurVal.toFixed(2)} TL`, change_pct: eurTry ? eurTry.changePct : '+0.15%' },
-    { name: 'Ons Altın ($)', price: `${goldVal.toFixed(2)} $`, change_pct: gold ? gold.changePct : '+0.35%' },
-    { name: 'Gram Altın', price: `${gramGoldVal} TL`, change_pct: gold ? gold.changePct : '+0.40%' },
-    { name: 'Ons Gümüş ($)', price: `${silverVal.toFixed(2)} $`, change_pct: silver ? silver.changePct : '+0.50%' },
-    { name: 'Gram Gümüş', price: `${gramSilverVal} TL`, change_pct: silver ? silver.changePct : '+0.45%' },
-    { name: 'Brent Petrol ($)', price: `${brentVal.toFixed(2)} $`, change_pct: brent ? brent.changePct : '-0.25%' },
-    { name: 'ABD 10Y Tahvil (%)', price: `${us10yVal.toFixed(2)}%`, change_pct: us10y ? us10y.changePct : '+0.01%' }
+    { name: 'USD/TRY', price: usdVal ? `${usdVal} TL` : 'Veri Yok', change_pct: usdTry ? usdTry.changePct : 'N/A' },
+    { name: 'EUR/TRY', price: eurVal ? `${eurVal} TL` : 'Veri Yok', change_pct: eurTry ? eurTry.changePct : 'N/A' },
+    { name: 'Ons Altın ($)', price: goldVal ? `${goldVal} $` : 'Veri Yok', change_pct: gold ? gold.changePct : 'N/A' },
+    { name: 'Gram Altın', price: gramGoldVal ? `${gramGoldVal} TL` : 'Veri Yok', change_pct: gold ? gold.changePct : 'N/A' },
+    { name: 'Ons Gümüş ($)', price: silverVal ? `${silverVal} $` : 'Veri Yok', change_pct: silver ? silver.changePct : 'N/A' },
+    { name: 'Gram Gümüş', price: gramSilverVal ? `${gramSilverVal} TL` : 'Veri Yok', change_pct: silver ? silver.changePct : 'N/A' },
+    { name: 'Brent Petrol ($)', price: brentVal ? `${brentVal} $` : 'Veri Yok', change_pct: brent ? brent.changePct : 'N/A' },
+    { name: 'ABD 10Y Tahvil (%)', price: us10yVal ? `${us10yVal}%` : 'Veri Yok', change_pct: us10y ? us10y.changePct : 'N/A' }
   ];
 
   return indicators;
@@ -136,7 +177,7 @@ Sen üst düzey bir Kurumsal Finans Uzmanı ve Hisse Senedi Araştırma (Equity 
 Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Türkiye Finans Bültenini hazırlayacaksın.
 
 KRİTİK UZMANLIK TALİMATLARI:
-1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
+1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER MALMALIDIR.
 2. AÇIKLAMALAR YÜZEYSEL OLMAYACAK! Tek cümlelik yüzeysel özetlerden kaçın. Her bir maddenin açıklamasında haberin arka planı, finansal/operasyonel sebepleri, net rakamsal verileri ve piyasa/sektör üzerindeki somut etkileri kurumsal finans uzmanı derinliğinde detaylıca yazılmalıdır. Gereksiz dolgu kelimeler kullanma, bilgi yoğunluğunu yüksek tut.
 
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
@@ -182,12 +223,16 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
       for (const mName of modelNames) {
         try {
+          console.log(`[Gemini] Trying model: ${mName}...`);
           const model = genAI.getGenerativeModel({ model: mName });
           const result = await model.generateContent(`${systemPrompt}\n\nVERİLER:\n${contextText}`);
           text = result.response.text().trim();
-          if (text) break;
+          if (text) {
+            console.log(`[Gemini] Success with model: ${mName}`);
+            break;
+          }
         } catch (e) {
-          // try next
+          console.warn(`[Gemini] Model ${mName} failed: ${e.message}`);
         }
       }
 
@@ -202,112 +247,96 @@ Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
     }
   }
 
-  console.log('[Live Synthesizer] Generating 100% fresh live bulletin from RSS news feeds...');
+  console.log('[Live Synthesizer] Gemini unavailable. Generating 100% fresh live bulletin from RSS news feeds...');
   return generateLiveRSSBulletin(bistNews, usNews, macroNews, todayStr);
 }
 
 function generateLiveRSSBulletin(bistNews, usNews, macroNews, todayStr) {
+  const NO_DATA_MSG = 'Bu bölümde güncel veri bulunamadı.';
   const defaultTickers = ['THYAO', 'AKBNK', 'TUPRS', 'EREGL', 'KCHOL'];
 
-  const turkeyItems = bistNews.slice(0, 5).map((item, idx) => ({
-    title: `${idx + 1}. ${item.title}`,
-    detail: `${item.summary} [Kaynak: ${item.source} - ${todayStr}]`
-  }));
+  // --- turkey_news: bistNews 0-4 (first 5) ---
+  const turkeySlice = bistNews.slice(0, 5);
+  const turkeyItems = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < turkeySlice.length) {
+      const item = turkeySlice[i];
+      turkeyItems.push({
+        title: `${i + 1}. ${item.title}`,
+        detail: `${item.summary} [Kaynak: ${item.source} - ${todayStr}]`
+      });
+    } else {
+      turkeyItems.push({
+        title: `${i + 1}. —`,
+        detail: NO_DATA_MSG
+      });
+    }
+  }
 
-  const bistImpactItems = bistNews.slice(5, 10).map((item, idx) => ({
-    topic: `${idx + 1}. ${item.title}`,
-    analysis: `Borsa İstanbul seansında ilgili sektör ve BIST 100 endeksi üzerindeki etkisi: ${item.summary}`
-  }));
+  // --- bist_impact_analysis: bistNews 5-9 (indices 5-10) ---
+  const bistSlice = bistNews.slice(5, 10);
+  const bistImpactItems = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < bistSlice.length) {
+      const item = bistSlice[i];
+      bistImpactItems.push({
+        topic: `${i + 1}. ${item.title}`,
+        analysis: `Borsa İstanbul seansında ilgili sektör ve BIST 100 endeksi üzerindeki etkisi: ${item.summary}`
+      });
+    } else {
+      bistImpactItems.push({
+        topic: `${i + 1}. —`,
+        analysis: NO_DATA_MSG
+      });
+    }
+  }
 
-  const companyItems = bistNews.slice(10, 15).map((item, idx) => ({
-    ticker: defaultTickers[idx % defaultTickers.length],
-    title: `${idx + 1}. ${item.title}`,
-    detail: `${item.summary} Şirket finansalları ve KAP açıklamaları yakından takip edilmektedir.`
-  }));
+  // --- company_news: bistNews 10-14 (indices 10-15) ---
+  const companySlice = bistNews.slice(10, 15);
+  const companyItems = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < companySlice.length) {
+      const item = companySlice[i];
+      companyItems.push({
+        ticker: defaultTickers[i % defaultTickers.length],
+        title: `${i + 1}. ${item.title}`,
+        detail: `${item.summary} Şirket finansalları ve KAP açıklamaları yakından takip edilmektedir.`
+      });
+    } else {
+      companyItems.push({
+        ticker: defaultTickers[i % defaultTickers.length],
+        title: `${i + 1}. —`,
+        detail: NO_DATA_MSG
+      });
+    }
+  }
 
-  const globalItems = macroNews.length >= 5 ? macroNews.slice(0, 5) : [...macroNews, ...usNews].slice(0, 5);
-  const formattedGlobal = globalItems.map((item, idx) => ({
-    title: `${idx + 1}. ${item.title}`,
-    detail: `${item.summary} [Kaynak: ${item.source} - Küresel Piyasalar]`
-  }));
+  // --- global_news: macroNews first 5, fill from usNews if needed ---
+  const globalPool = [...macroNews, ...usNews];
+  const globalSlice = globalPool.slice(0, 5);
+  const globalItems = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < globalSlice.length) {
+      const item = globalSlice[i];
+      globalItems.push({
+        title: `${i + 1}. ${item.title}`,
+        detail: `${item.summary} [Kaynak: ${item.source} - Küresel Piyasalar]`
+      });
+    } else {
+      globalItems.push({
+        title: `${i + 1}. —`,
+        detail: NO_DATA_MSG
+      });
+    }
+  }
 
   return {
     title: `🇹🇷 Türkiye Finans Bülteni - ${todayStr}`,
-    turkey_news: turkeyItems.length === 5 ? turkeyItems : getFallbackTurkeyNews(todayStr),
-    bist_impact_analysis: bistImpactItems.length === 5 ? bistImpactItems : getFallbackBistImpact(todayStr),
-    company_news: companyItems.length === 5 ? companyItems : getFallbackCompanyNews(todayStr),
-    global_news: formattedGlobal.length === 5 ? formattedGlobal : getFallbackGlobalNews(todayStr)
+    turkey_news: turkeyItems,
+    bist_impact_analysis: bistImpactItems,
+    company_news: companyItems,
+    global_news: globalItems
   };
-}
-
-function getFallbackTurkeyNews(todayStr) {
-  return [
-    {
-      title: "1. Türkiye 5 Yıllık CDS Primlerinde Son Seviye ve Risk Primi İyileşmesi",
-      detail: `Türkiye'nin 5 yıllık Kredi Temerrüt Takası (CDS) primi risk primindeki toparlanmayı sürdürüyor. [Tarih: ${todayStr}]`
-    },
-    {
-      title: "2. TCMB Parasal Sıkılaşma ve Dezenflasyon Patikası Kararlılığı",
-      detail: `TCMB politika faizini sıkı duruşta tutarak TL mevduat cazibesini korumaya ve enflasyonla mücadeleye devam ediyor. [Tarih: ${todayStr}]`
-    },
-    {
-      title: "3. Ticaret Bakanlığı İhracat ve Dış Ticaret Dengesi Verileri",
-      detail: `Dış ticaret açığındaki daralma eğilimi ve ihracattaki katma değerli artış cari dengedeki toparlanmayı destekliyor. [Tarih: ${todayStr}]`
-    },
-    {
-      title: "4. Kamuda Tasarruf Tedbirleri ve Bütçe Disiplini Takvimi",
-      detail: `Hazine ve Maliye Bakanlığı bütçe dengesini koruma hedefleri doğrultusunda maliye politikası tedbirlerini uyguluyor. [Tarih: ${todayStr}]`
-    },
-    {
-      title: "5. MKK Verileri: Borsa İstanbul Yatırımcı Tabanı ve Takas Oranları",
-      detail: `Borsa İstanbul'daki kurumsal yatırımcı takas payları piyasa likiditesini ve derinliğini desteklemeyi sürdürüyor. [Tarih: ${todayStr}]`
-    }
-  ];
-}
-
-function getFallbackBistImpact(todayStr) {
-  return [
-    {
-      topic: "1. Risk Primindeki İyileşmenin Bankacılık Endeksi (XBANK) Üzerindeki Etkisi",
-      analysis: "Düşen CDS primleri ve yabancı ilgisi BIST 30 bankacılık hisselerinde özkaynak maliyetini olumlu etkilemektedir."
-    },
-    {
-      topic: "2. Brent Petrol Seyrinin Ulaştırma ve Perakende Sektörlerine Yansıması",
-      analysis: "Petrol fiyatlarındaki dengelenme havacılık sektöründe marj beklentilerini, perakende sektöründe lojistik giderlerini etkilemektedir."
-    },
-    {
-      topic: "3. Sıkı Kredi Koşullarının Sanayi ve Tüketici Sektörlerine Yansıması",
-      analysis: "Yüksek faiz ortamında güçlü net nakit pozisyonuna sahip şirketlerin seans içi performans ayrışması beklenmektedir."
-    },
-    {
-      topic: "4. Kur Hareketlerinin İhracatçı Şirketler Üzerindeki Marj Etkisi",
-      analysis: "Döviz kurlarındaki kontrollü seyir maliyet öngörülebilirliğini artırırken AB pazarındaki talep yakından izlenmektedir."
-    },
-    {
-      topic: "5. Enflasyon Muhasebesi Düzenlemelerinin Bilanço Kar Marjlarına Etkisi",
-      analysis: "Özkaynak yapısı güçlü şirketlerin finansal sonuçlarında pozitif ayrışması öngörülmektedir."
-    }
-  ];
-}
-
-function getFallbackCompanyNews(todayStr) {
-  return [
-    { ticker: "THYAO", title: "1. Türk Hava Yolları Yolcu ve Operasyonel Verileri", detail: "THY yolcu doluluk oranları ve filo genişleme adımlarıyla büyüme stratejisini sürdürüyor." },
-    { ticker: "AKBNK", title: "2. Akbank Kurumsal Finansal Sonuçlar ve Takas Payı", detail: "Akbank net faiz marjı ve yabancı takas payındaki güçlü görünümünü koruyor." },
-    { ticker: "TUPRS", title: "3. Tüpraş Rafineri Marjları ve Dönüşüm Yatırımları", detail: "Tüpraş yüksek kapasite kullanımı ve stratejik yeşil dönüşüm projelerine devam ediyor." },
-    { ticker: "EREGL", title: "4. Ereğli Demir Çelik Kapasite Kullanımı ve Yatırımlar", detail: "Erdemir yeşil çelik dönüşüm programı ve kapasite kullanımı ile sektör talebini karşılıyor." },
-    { ticker: "KCHOL", title: "5. Koç Holding Portföy Şirketleri ve Yatırım Bildirimleri", detail: "Koç Holding iştiraklerinin operasyonel performansı portföy net aktif değerini destekliyor." }
-  ];
-}
-
-function getFallbackGlobalNews(todayStr) {
-  return [
-    { title: "1. ABD Enflasyon Verileri ve Fed Faiz Patikası Beklentileri", detail: "ABD enflasyon rakamları ve Fed faiz indirim süreci küresel piyasaların odağında yer alıyor." },
-    { title: "2. Fed Sempozyum Mesajları ve Küresel Tahvil Piyasaları", detail: "Fed yetkililerinin konuşmaları küresel tahvil getirileri ve risk iştahını şekillendiriyor." },
-    { title: "3. Küresel Teknoloji Devleri ve Bilanço Dönemi Sonuçları", detail: "Big Tech şirketlerinin gelir ve CapEx açıklamaları küresel borsa endekslerine yön veriyor." },
-    { title: "4. Avrupa Merkez Bankası (ECB) Ekonomi ve Faiz Görünümü", detail: "Euro Bölgesi PMI verileri ve ECB kararları pariteler üzerinde etki yaratmaktadır." },
-    { title: "5. Küresel Enerji Rotaları ve Emtia Piyasaları Dinamikleri", detail: "Petrol ve değerli maden fiyatları güvenli liman talebi ve arz kotaları ile dengeleniyor." }
-  ];
 }
 
 function renderHtml(bulletin, indicators) {
