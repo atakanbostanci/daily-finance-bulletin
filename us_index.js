@@ -6,6 +6,56 @@ const Parser = require('rss-parser');
 const nodemailer = require('nodemailer');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// OpenRouter API helper (OpenAI-compatible, free models available)
+function callOpenRouter(apiKey, systemPrompt, userContent) {
+  return new Promise((resolve, reject) => {
+    const postData = JSON.stringify({
+      models: [
+        'minimax/minimax-m3:free',
+        'nvidia/nemotron-3.5-lightning:free',
+        'google/gemma-4-31b-it:free'
+      ],
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent }
+      ],
+      temperature: 0.3,
+      max_tokens: 8000
+    });
+    const options = {
+      hostname: 'openrouter.ai',
+      path: '/api/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://github.com/atakanbostanci/daily-finance-bulletin',
+        'X-Title': 'Finans Bulteni',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+    const req = https.request(options, res => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.choices && json.choices[0]) {
+            resolve(json.choices[0].message.content.trim());
+          } else {
+            reject(new Error(json.error ? json.error.message : 'No choices in response'));
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
 const parser = new Parser({
   headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
   timeout: 10000
@@ -275,31 +325,19 @@ B\u00FClten SADECE a\u015Fa\u011F\u0131daki JSON format\u0131nda olmak zorundad\
     }
   }
 
-  // --- Attempt 2: Groq API (FREE, unlimited) ---
-  const groqKey = process.env.GROQ_API_KEY;
-  if (groqKey && !groqKey.includes('your_groq')) {
+  // --- Attempt 2: OpenRouter API (FREE, no credit card needed) ---
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (openRouterKey && !openRouterKey.includes('your_openrouter')) {
     try {
-      console.log('[Groq] Trying Groq AI (free tier)...');
-      const Groq = require('groq-sdk');
-      const groq = new Groq({ apiKey: groqKey });
-      const chatCompletion = await groq.chat.completions.create({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: 'VERİLER:\n' + contextText }
-        ],
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0.3,
-        max_tokens: 8000,
-        response_format: { type: 'json_object' }
-      });
-      let text = chatCompletion.choices[0].message.content.trim();
+      console.log('[OpenRouter] Trying OpenRouter AI (free tier)...');
+      let text = await callOpenRouter(openRouterKey, systemPrompt, 'VERİLER:\n' + contextText);
       if (text) {
-        console.log('[Groq] Success with llama-3.3-70b-versatile');
+        console.log('[OpenRouter] Success!');
         if (text.startsWith('```')) text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
         return JSON.parse(text);
       }
     } catch (err) {
-      console.warn(`[Groq] Failed: ${err.message.substring(0, 100)}`);
+      console.warn(`[OpenRouter] Failed: ${err.message.substring(0, 100)}`);
     }
   }
 
