@@ -1,9 +1,6 @@
 name: Morning Turkey Finance Bulletin (08:00 TR)
 
 on:
-  schedule:
-    # 05:00 UTC = 08:00 AM Turkey Time (UTC+3)
-    - cron: '0 5 * * *'
   repository_dispatch:
     types: [morning-bulletin]
   workflow_dispatch:

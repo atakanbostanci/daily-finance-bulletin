@@ -1,9 +1,6 @@
 name: Afternoon US Wall Street Bulletin (16:00 TR)
 
 on:
-  schedule:
-    # 13:00 UTC = 16:00 PM Turkey Time (UTC+3)
-    - cron: '0 13 * * *'
   repository_dispatch:
     types: [us-bulletin]
   workflow_dispatch:

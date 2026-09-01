@@ -163,8 +163,7 @@ async function fetchMarketIndicators() {
   return indicators;
 }
 
-async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicators) {
-  const apiKey = process.env.GEMINI_API_KEY;
+async function generateBulletinWithAI(bistNews, usNews, macroNews, indicators) {
   const todayStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   let contextText = `=== BUGÜNÜN TARİHİ: ${todayStr} ===\n\n`;
@@ -172,82 +171,107 @@ async function generateBulletinWithGemini(bistNews, usNews, macroNews, indicator
   contextText += `=== ABD PİYASALARI HABERLERİ ===\n` + usNews.map(i => `- [${i.source}] ${i.title}: ${i.summary}`).join('\n') + '\n\n';
   contextText += `=== KÜRESEL MAKROEKONOMİ HABERLERİ ===\n` + macroNews.map(i => `- [${i.source}] ${i.title}: ${i.summary}`).join('\n');
 
-  const systemPrompt = `
-Sen üst düzey bir Kurumsal Finans Uzmanı ve Hisse Senedi Araştırma (Equity Research) Direktörüsün. 
+  const systemPrompt = `Sen üst düzey bir Kurumsal Finans Uzmanı ve Hisse Senedi Araştırma (Equity Research) Direktörüsün. 
 Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 itibarıyla Kurumsal Finans Uzmanının okuyacağı VIP Türkiye Finans Bültenini hazırlayacaksın.
 
 KRİTİK UZMANLIK TALİMATLARI:
-1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER MALMALIDIR.
+1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
 2. AÇIKLAMALAR YÜZEYSEL OLMAYACAK! Tek cümlelik yüzeysel özetlerden kaçın. Her bir maddenin açıklamasında haberin arka planı, finansal/operasyonel sebepleri, net rakamsal verileri ve piyasa/sektör üzerindeki somut etkileri kurumsal finans uzmanı derinliğinde detaylıca yazılmalıdır. Gereksiz dolgu kelimeler kullanma, bilgi yoğunluğunu yüksek tut.
+3. TÜM İÇERİK KUSURSUZ TÜRKÇE OLMALIDIR. İngilizce haber başlıkları ve içerikleri profesyonel finans Türkçesine %100 doğrulukla çevrilmelidir. Hiçbir İngilizce kelime veya cümle bırakılmamalıdır.
+4. Sadece JSON formatında yanıt ver, başka hiçbir metin ekleme.
 
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
 {
   "title": "🇹🇷 Türkiye Finans Bülteni - ${todayStr}",
   "turkey_news": [
-    {"title": "1. En Önemli Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı, rakamsal ve finansal arka planı içeren açıklama..."},
-    {"title": "2. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "3. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "4. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "5. Türkiye Siyasi/Ekonomik Gelişme Başlığı", "detail": "Detaylı açıklama..."}
+    {"title": "1. Başlık", "detail": "Detaylı açıklama..."},
+    {"title": "2. Başlık", "detail": "Detaylı açıklama..."},
+    {"title": "3. Başlık", "detail": "Detaylı açıklama..."},
+    {"title": "4. Başlık", "detail": "Detaylı açıklama..."},
+    {"title": "5. Başlık", "detail": "Detaylı açıklama..."}
   ],
   "bist_impact_analysis": [
-    {"topic": "1. En Kritik Gündem Konusu", "analysis": "BIST 100, XBANK, sanayi endeksi ve ilgili hisse gruplarına olası seans içi ve orta vadeli etkilerinin derinlemesine finansal analizi..."},
-    {"topic": "2. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
-    {"topic": "3. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
-    {"topic": "4. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."},
-    {"topic": "5. Gündem Konusu", "analysis": "Olası Borsa etkisinin detaylı analizi..."}
+    {"topic": "1. Konu", "analysis": "BIST 100 ve ilgili endekslere olası etkinin detaylı finansal analizi..."},
+    {"topic": "2. Konu", "analysis": "Analiz..."},
+    {"topic": "3. Konu", "analysis": "Analiz..."},
+    {"topic": "4. Konu", "analysis": "Analiz..."},
+    {"topic": "5. Konu", "analysis": "Analiz..."}
   ],
   "company_news": [
-    {"ticker": "THYAO", "title": "1. En Önemli Şirket Haberi/KAP Başlığı", "detail": "Operasyonel sonuçlar, doluluk oranları, marjlar, temettü, yatırımlar veya hedef fiyat detayları..."},
-    {"ticker": "AKBNK", "title": "2. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
-    {"ticker": "TUPRS", "title": "3. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
-    {"ticker": "EREGL", "title": "4. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."},
-    {"ticker": "ICU", "title": "5. Şirket Haberi/KAP Başlığı", "detail": "Finansal ve operasyonel detaylar..."}
+    {"ticker": "THYAO", "title": "1. Başlık", "detail": "Detay..."},
+    {"ticker": "AKBNK", "title": "2. Başlık", "detail": "Detay..."},
+    {"ticker": "TUPRS", "title": "3. Başlık", "detail": "Detay..."},
+    {"ticker": "EREGL", "title": "4. Başlık", "detail": "Detay..."},
+    {"ticker": "KCHOL", "title": "5. Başlık", "detail": "Detay..."}
   ],
   "global_news": [
-    {"title": "1. En Önemli Küresel/Dünya Gündemi Haberi Başlığı", "detail": "Fed, ECB, emtialar veya Big Tech üzerindeki küresel etkileriyle detaylı açıklama..."},
-    {"title": "2. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "3. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "4. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."},
-    {"title": "5. Küresel Gündem Haberi Başlığı", "detail": "Detaylı açıklama..."}
+    {"title": "1. Başlık", "detail": "Detay..."},
+    {"title": "2. Başlık", "detail": "Detay..."},
+    {"title": "3. Başlık", "detail": "Detay..."},
+    {"title": "4. Başlık", "detail": "Detay..."},
+    {"title": "5. Başlık", "detail": "Detay..."}
   ]
-}
-`;
+}`;
 
-  if (apiKey && !apiKey.includes('your_gemini_api_key')) {
+  const fullPrompt = systemPrompt + '\n\nVERİLER:\n' + contextText;
+
+  // --- Attempt 1: Gemini API ---
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey && !geminiKey.includes('your_gemini_api_key')) {
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const modelNames = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
-      let text = null;
-
+      const genAI = new GoogleGenerativeAI(geminiKey);
+      const modelNames = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'];
       for (const mName of modelNames) {
         try {
           console.log(`[Gemini] Trying model: ${mName}...`);
           const model = genAI.getGenerativeModel({ model: mName });
-          const result = await model.generateContent(`${systemPrompt}\n\nVERİLER:\n${contextText}`);
-          text = result.response.text().trim();
+          const result = await model.generateContent(fullPrompt);
+          let text = result.response.text().trim();
           if (text) {
             console.log(`[Gemini] Success with model: ${mName}`);
-            break;
+            if (text.startsWith('```')) text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
+            return JSON.parse(text);
           }
         } catch (e) {
-          console.warn(`[Gemini] Model ${mName} failed: ${e.message}`);
+          console.warn(`[Gemini] Model ${mName} failed: ${e.message.substring(0, 100)}`);
         }
-      }
-
-      if (text) {
-        if (text.startsWith('```')) {
-          text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
-        }
-        return JSON.parse(text);
       }
     } catch (err) {
-      console.warn(`[Gemini Warn] ${err.message}. Using Live RSS Synthesizer.`);
+      console.warn(`[Gemini Warn] ${err.message}`);
     }
   }
 
-  console.log('[Live Synthesizer] Gemini unavailable. Generating 100% fresh live bulletin from RSS news feeds...');
+  // --- Attempt 2: Groq API (FREE, unlimited) ---
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey && !groqKey.includes('your_groq')) {
+    try {
+      console.log('[Groq] Trying Groq AI (free tier)...');
+      const Groq = require('groq-sdk');
+      const groq = new Groq({ apiKey: groqKey });
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'VERİLER:\n' + contextText }
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.3,
+        max_tokens: 8000,
+        response_format: { type: 'json_object' }
+      });
+      let text = chatCompletion.choices[0].message.content.trim();
+      if (text) {
+        console.log('[Groq] Success with llama-3.3-70b-versatile');
+        if (text.startsWith('```')) text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
+        return JSON.parse(text);
+      }
+    } catch (err) {
+      console.warn(`[Groq] Failed: ${err.message.substring(0, 100)}`);
+    }
+  }
+
+  // --- Attempt 3: RSS Synthesizer (last resort) ---
+  console.log('[Live Synthesizer] All AI services unavailable. Generating bulletin from RSS news feeds...');
   return generateLiveRSSBulletin(bistNews, usNews, macroNews, todayStr);
 }
 
@@ -475,7 +499,7 @@ async function main() {
   console.log(`Fetched: ${bistNews.length} BIST items, ${usNews.length} US items, ${macroNews.length} Macro items.`);
 
   console.log('Step 2/4: Generating 5-Item 4-Section AI Bulletin...');
-  const bulletin = await generateBulletinWithGemini(bistNews, usNews, macroNews, indicators);
+  const bulletin = await generateBulletinWithAI(bistNews, usNews, macroNews, indicators);
 
   console.log('Step 3/4: Rendering Executive HTML Email Template...');
   const htmlContent = renderHtml(bulletin, indicators);

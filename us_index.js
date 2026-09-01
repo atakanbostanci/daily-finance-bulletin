@@ -248,39 +248,63 @@ B\u00FClten SADECE a\u015Fa\u011F\u0131daki JSON format\u0131nda olmak zorundad\
 }
 `;
 
+  const fullPrompt = systemPrompt + '\n\nVERİLER:\n' + contextText;
+
+  // --- Attempt 1: Gemini API ---
   if (apiKey && !apiKey.includes('your_gemini_api_key')) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const modelNames = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
-      let text = null;
-
+      const modelNames = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'];
       for (const mName of modelNames) {
         try {
           console.log(`[Gemini] Trying model: ${mName}...`);
           const model = genAI.getGenerativeModel({ model: mName });
-          const result = await model.generateContent(`${systemPrompt}\n\nVER\u0130LER:\n${contextText}`);
-          text = result.response.text().trim();
+          const result = await model.generateContent(fullPrompt);
+          let text = result.response.text().trim();
           if (text) {
             console.log(`[Gemini] Success with model: ${mName}`);
-            break;
+            if (text.startsWith('```')) text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
+            return JSON.parse(text);
           }
         } catch (e) {
-          console.warn(`[Gemini] Model ${mName} failed: ${e.message}. Trying next...`);
+          console.warn(`[Gemini] Model ${mName} failed: ${e.message.substring(0, 100)}`);
         }
-      }
-
-      if (text) {
-        if (text.startsWith('```')) {
-          text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
-        }
-        return JSON.parse(text);
       }
     } catch (err) {
-      console.warn(`[Gemini Warn] ${err.message}. Using Live US RSS Synthesizer.`);
+      console.warn(`[Gemini Warn] ${err.message}`);
     }
   }
 
-  console.log('[Live Synthesizer] Generating 100% fresh live US Wall Street bulletin from RSS news feeds...');
+  // --- Attempt 2: Groq API (FREE, unlimited) ---
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey && !groqKey.includes('your_groq')) {
+    try {
+      console.log('[Groq] Trying Groq AI (free tier)...');
+      const Groq = require('groq-sdk');
+      const groq = new Groq({ apiKey: groqKey });
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'VERİLER:\n' + contextText }
+        ],
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.3,
+        max_tokens: 8000,
+        response_format: { type: 'json_object' }
+      });
+      let text = chatCompletion.choices[0].message.content.trim();
+      if (text) {
+        console.log('[Groq] Success with llama-3.3-70b-versatile');
+        if (text.startsWith('```')) text = text.replace(/^```json/, '').replace(/^```/, '').replace(/```$/, '').trim();
+        return JSON.parse(text);
+      }
+    } catch (err) {
+      console.warn(`[Groq] Failed: ${err.message.substring(0, 100)}`);
+    }
+  }
+
+  // --- Attempt 3: RSS Synthesizer (last resort) ---
+  console.log('[Live Synthesizer] All AI services unavailable. Generating bulletin from RSS news feeds...');
   return generateLiveUSRSSBulletin(usNews, macroNews, watchNews, todayStr);
 }
 
