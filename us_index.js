@@ -84,24 +84,44 @@ function cleanText(text) {
 
 async function fetchFeed(sources, maxPerFeed = 10) {
   const items = [];
+  const seenTitles = new Set();
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000; // Son 24 saat
+
   for (const src of sources) {
     try {
       const feed = await parser.parseURL(src.url);
       const entries = feed.items.slice(0, maxPerFeed);
       for (const entry of entries) {
-        if (entry.title) {
-          items.push({
-            source: src.name,
-            title: cleanText(entry.title),
-            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 500),
-            link: entry.link || '#'
-          });
+        if (!entry.title) continue;
+
+        // Tarih filtresi: sadece son 24 saatteki haberleri al
+        const pubDate = entry.pubDate || entry.isoDate;
+        if (pubDate) {
+          const entryTime = new Date(pubDate).getTime();
+          if (entryTime < cutoff) continue;
         }
+
+        // Tekrar filtresi: aynı başlıklı haberi alma
+        const titleNorm = cleanText(entry.title).toLowerCase().substring(0, 60);
+        if (seenTitles.has(titleNorm)) continue;
+        seenTitles.add(titleNorm);
+
+        items.push({
+          source: src.name,
+          title: cleanText(entry.title),
+          summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 500),
+          link: entry.link || '#',
+          date: pubDate || new Date().toISOString()
+        });
       }
     } catch (err) {
       console.warn(`[RSS Warning] Failed to fetch ${src.name}: ${err.message}`);
     }
   }
+
+  // En yeni haberler önce gelsin
+  items.sort((a, b) => new Date(b.date) - new Date(a.date));
+  console.log(`[RSS Filter] ${items.length} unique news items from last 24h (duplicates & old removed).`);
   return items;
 }
 
@@ -250,11 +270,16 @@ KR\u0130T\u0130K UZMANLIK TAL\u0130MATLARI:
 1. B\u00FClten tam olarak 5 ana b\u00F6l\u00FCmden olu\u015Facakt\u0131r.
 2. \u0130lk 4 b\u00F6l\u00FCm\u00FCn HER B\u0130R\u0130NDE \u00D6NEM SIRASINA G\u00D6RE EN \u0130LG\u0130L\u0130 VE EN KR\u0130T\u0130K TAM 5 (BE\u015E) ADET MADDES\u0130 YER ALMALIDIR.
 3. 5. B\u00D6L\u00DCM: \u00D6ZEL TAK\u0130P L\u0130STES\u0130 H\u0130SSELER\u0130D\u0130R. Bu b\u00F6l\u00FCmde tam olarak \u015Fu 8 hisse senedi s\u0131ras\u0131yla yer almak ZORUNLUDUR: ORCL, TSLA, SPCX, SMCI, MSFT, AMZN, ADBE, AAPL.
-   Her bir hisse i\u00E7in SANA VER\u0130LEN \u0130ZLEME L\u0130STES\u0130 H\u0130SSE HABERLER\u0130 KISMINDAKİ CANLI HABERLER\u0130 KULLANARAK:
+   Her bir hisse i\u00E7in SANA VER\u0130LEN \u0130ZLEME L\u0130STES\u0130 H\u0130SSE HABERLER\u0130 KISMINDAK\u0130 CANLI HABERLER\u0130 KULLANARAK:
    - \u015Eirketin en g\u00FCncel canl\u0131 haberini detayl\u0131ca \u00F6zetle,
    - Haberin hisse senedi fiyat hareketini seans i\u00E7erisinde nas\u0131l etkileyece\u011Fine dair detayl\u0131 a\u00E7\u0131klama ve y\u00F6n \u00F6ng\u00F6r\u00FCs\u00FC (Pozitif/N\u00F6tr/Negatif beklenti ve fiyat kataliz\u00F6r\u00FC nedeni) ekle. Eski veya jenerik yorum YAPMA, o g\u00FCnk\u00FC canl\u0131 haberi baz al.
 
-B\u00FClten SADECE a\u015Fa\u011F\u0131daki JSON format\u0131nda olmak zorundad\u0131r:
+D\u0130L KURALI \u2014 MUTLAK ZORUNLULUK:
+4. B\u00DCLTEN\u0130N HER KEL\u0130MES\u0130, HER C\u00DCMLES\u0130, HER BA\u015ELIGI KUSURSUZ T\u00DCRK\u00C7E OLMALIDIR. \u0130ngilizce haber ba\u015Fl\u0131klar\u0131n\u0131 ve i\u00E7eriklerini profesyonel finans T\u00FCrk\u00E7esine birebir ve eksiksiz \u00E7evir. \u015Eirket isimleri (Apple, Tesla vb.) ve borsa kodlar\u0131 (ORCL, AAPL vb.) hari\u00E7 hi\u00E7bir \u0130ngilizce kelime, terim veya c\u00FCmle par\u00E7as\u0131 b\u0131rak\u0131lmamal\u0131d\u0131r. "Rally", "bullish", "bearish", "surge", "plunge", "pre-market movers" gibi finans terimlerini bile T\u00FCrk\u00E7e kar\u015F\u0131l\u0131klar\u0131yla yaz (y\u00FCkseli\u015F, bo\u011Fa piyasas\u0131, ay\u0131 piyasas\u0131, s\u0131\u00E7rama, d\u00FC\u015F\u00FC\u015F, seans \u00F6ncesi hareket edenler vb.).
+
+G\u00DCNCELL\u0130K KURALI \u2014 MUTLAK ZORUNLULUK:
+5. SADECE BUG\u00DCN\u00DCN (${todayStr}) EN G\u00DCNCEL HABERLER\u0130N\u0130 KULLAN. D\u00FCn\u00FCn veya \u00F6nceki g\u00FCnlerin haberlerini ASLA tekrarlama. E\u011Fer sa\u011Flanan verilerde ayn\u0131 konuya dair birden fazla haber varsa, en yenisini ve en \u00F6nemlisini se\u00E7, tekrar etme. Her b\u00FClten birbirinden farkl\u0131 ve o g\u00FCn\u00FCn ger\u00E7ek g\u00FCndemine ait olmal\u0131d\u0131r.
+6. Sadece JSON format\u0131nda yan\u0131t ver, ba\u015Fka hi\u00E7bir metin ekleme.
 
 {
   "title": "\uD83C\uDDFA\uD83C\uDDF8 Amerika Finans B\u00FClteni - ${todayStr}",

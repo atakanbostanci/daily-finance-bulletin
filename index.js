@@ -90,24 +90,44 @@ function cleanText(text) {
 
 async function fetchFeed(sources, maxPerFeed = 10) {
   const items = [];
+  const seenTitles = new Set();
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000; // Son 24 saat
+
   for (const src of sources) {
     try {
       const feed = await parser.parseURL(src.url);
       const entries = feed.items.slice(0, maxPerFeed);
       for (const entry of entries) {
-        if (entry.title) {
-          items.push({
-            source: src.name,
-            title: cleanText(entry.title),
-            summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 500),
-            link: entry.link || '#'
-          });
+        if (!entry.title) continue;
+
+        // Tarih filtresi: sadece son 24 saatteki haberleri al
+        const pubDate = entry.pubDate || entry.isoDate;
+        if (pubDate) {
+          const entryTime = new Date(pubDate).getTime();
+          if (entryTime < cutoff) continue; // Eski haberi atla
         }
+
+        // Tekrar filtresi: aynı başlıklı haberi alma
+        const titleNorm = cleanText(entry.title).toLowerCase().substring(0, 60);
+        if (seenTitles.has(titleNorm)) continue;
+        seenTitles.add(titleNorm);
+
+        items.push({
+          source: src.name,
+          title: cleanText(entry.title),
+          summary: cleanText(entry.contentSnippet || entry.content || entry.title).slice(0, 500),
+          link: entry.link || '#',
+          date: pubDate || new Date().toISOString()
+        });
       }
     } catch (err) {
       console.warn(`[RSS Warning] Failed to fetch ${src.name}: ${err.message}`);
     }
   }
+
+  // En yeni haberler önce gelsin
+  items.sort((a, b) => new Date(b.date) - new Date(a.date));
+  console.log(`[RSS Filter] ${items.length} unique news items from last 24h (duplicates & old removed).`);
   return items;
 }
 
@@ -227,8 +247,13 @@ Sana sağlanan güncel haberleri ve verileri inceleyerek, her sabah saat 08:00 i
 KRİTİK UZMANLIK TALİMATLARI:
 1. Bülten tam olarak 4 ana bölümden oluşmalı ve HER BİR BÖLÜMDE ÖNEM SIRASINA GÖRE EN İLGİLİ VE EN KRİTİK TAM 5 (BEŞ) ADET HABER VEYA ANALİZ MADDESİ YER ALMALIDIR.
 2. AÇIKLAMALAR YÜZEYSEL OLMAYACAK! Tek cümlelik yüzeysel özetlerden kaçın. Her bir maddenin açıklamasında haberin arka planı, finansal/operasyonel sebepleri, net rakamsal verileri ve piyasa/sektör üzerindeki somut etkileri kurumsal finans uzmanı derinliğinde detaylıca yazılmalıdır. Gereksiz dolgu kelimeler kullanma, bilgi yoğunluğunu yüksek tut.
-3. TÜM İÇERİK KUSURSUZ TÜRKÇE OLMALIDIR. İngilizce haber başlıkları ve içerikleri profesyonel finans Türkçesine %100 doğrulukla çevrilmelidir. Hiçbir İngilizce kelime veya cümle bırakılmamalıdır.
-4. Sadece JSON formatında yanıt ver, başka hiçbir metin ekleme.
+
+DİL KURALI — MUTLAK ZORUNLULUK:
+3. BÜLTENIN HER KELİMESİ, HER CÜMLESİ, HER BAŞLIĞI KUSURSUZ TÜRKÇE OLMALIDIR. İngilizce haber başlıklarını ve içeriklerini profesyonel finans Türkçesine birebir ve eksiksiz çevir. Şirket isimleri (Apple, Tesla vb.) ve borsa kodları (THYAO, AAPL vb.) hariç hiçbir İngilizce kelime, terim veya cümle parçası bırakılmamalıdır. "Rally", "bullish", "bearish", "surge", "plunge" gibi finans terimlerini bile Türkçe karşılıklarıyla yaz (yükseliş, boğa piyasası, ayı piyasası, sıçrama, düşüş vb.).
+
+GÜNCELLİK KURALI — MUTLAK ZORUNLULUK:
+4. SADECE BUGÜNÜN (${todayStr}) EN GÜNCEL HABERLERİNİ KULLAN. Dünün veya önceki günlerin haberlerini ASLA tekrarlama. Eğer sağlanan verilerde aynı konuya dair birden fazla haber varsa, en yenisini ve en önemlisini seç, tekrar etme. Her bülten birbirinden farklı ve o günün gerçek gündemine ait olmalıdır.
+5. Sadece JSON formatında yanıt ver, başka hiçbir metin ekleme.`;
 
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 
