@@ -50,6 +50,11 @@ function callOpenRouter(apiKey, systemPrompt, userContent) {
         }
       });
     });
+    
+    req.setTimeout(60000, () => {
+      req.destroy(new Error('OpenRouter API timeout (60s)'));
+    });
+    
     req.on('error', reject);
     req.write(postData);
     req.end();
@@ -253,7 +258,7 @@ DİL KURALI — MUTLAK ZORUNLULUK:
 
 GÜNCELLİK KURALI — MUTLAK ZORUNLULUK:
 4. SADECE BUGÜNÜN (${todayStr}) EN GÜNCEL HABERLERİNİ KULLAN. Dünün veya önceki günlerin haberlerini ASLA tekrarlama. Eğer sağlanan verilerde aynı konuya dair birden fazla haber varsa, en yenisini ve en önemlisini seç, tekrar etme. Her bülten birbirinden farklı ve o günün gerçek gündemine ait olmalıdır.
-5. Sadece JSON formatında yanıt ver, başka hiçbir metin ekleme.`;
+5. Sadece JSON formatında yanıt ver, başka hiçbir metin ekleme.
 
 Bülten SADECE aşağıdaki JSON formatında olmak zorundadır:
 

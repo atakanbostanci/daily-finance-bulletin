@@ -50,6 +50,11 @@ function callOpenRouter(apiKey, systemPrompt, userContent) {
         }
       });
     });
+    
+    req.setTimeout(60000, () => {
+      req.destroy(new Error('OpenRouter API timeout (60s)'));
+    });
+    
     req.on('error', reject);
     req.write(postData);
     req.end();
